@@ -1,11 +1,13 @@
 import mysql.connector
 from mysql.connector import Error
+from model.SchemaGraph import SchemaGraph
 
 class Controller:
+    conn = None
     def __init__(self):
         pass
 
-    def start_connection(self):
+    def startConnection(self):
         """ Connect to MySQL database """
         try:
             conn = mysql.connector.connect(host='127.0.01',
@@ -14,25 +16,19 @@ class Controller:
                                            password='Codechef')
             if conn.is_connected():
                 print('Connected to MySQL database')
-            cursor = conn.cursor()
-            cursor.execute("SHOW TABLES")
 
-            for(table_name) in cursor:
-                print table_name
-
-            print "\ncolumns:\n"
-            cursor.execute("SHOW COLUMNS FROM author")
-
-            for(column_name) in cursor:
-                print column_name
-
+            schema = SchemaGraph(conn)
+            schema.readPrimaryKeys()
 
         except Error as e:
             print(e)
 
-        finally:
+    def closeConnection(self):
+        try:
             conn.close()
-            print("Database connection closed")
+        except Error as e:
+            print(e)
+        print("Database connection closed")
 
 controller = Controller()
-controller.start_connection()
+controller.startConnection()
