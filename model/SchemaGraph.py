@@ -1,6 +1,3 @@
-import mysql.connector
-from mysql.connector import Error
-
 class SchemaGraph :
 
     tables = None
@@ -16,7 +13,7 @@ class SchemaGraph :
         print "Retrieving schema graph..."
         cursor = connection.cursor()
 
-        cursor.execute("USE dblp")
+        cursor.execute("USE db_b130974cs")
 
         cursor.execute("SHOW TABLES")
         table_names = cursor.fetchall()
@@ -43,17 +40,86 @@ class SchemaGraph :
 
             SchemaGraph.tables[table_name[0]] = col_name_type_dict
             SchemaGraph.tableRows[table_name[0]] = col_name_values_dict
-
-        print "printing tables..."
+        print "\nprinting tables..."
         print SchemaGraph.tables
-        print "printing tablerows..."
+        print "\nprinting tablerows..."
         print SchemaGraph.tableRows
 
+        SchemaGraph.readPrimaryKeys(self, connection)
+        SchemaGraph.findConnectivity(self)
 
+    def readPrimaryKeys(self, connection):
+        SchemaGraph.keys = dict()
+        cursor = connection.cursor()
 
+        for tableName in SchemaGraph.tables.iterkeys():
+            cursor.execute("SHOW keys FROM %s WHERE Key_name = 'PRIMARY'" %tableName)
+            rsPrimaryKey = cursor.fetchall()
 
+            SchemaGraph.keys[tableName] = dict()
+            pkList = list()
 
+            for row in rsPrimaryKey:
+                pkList.append(row[4])
 
+            SchemaGraph.keys[tableName] = pkList
+        print "\nprinting primary keys..."
+        print SchemaGraph.keys
+
+    def findConnectivity(self):
+        SchemaGraph.connectivity = dict()
+
+        for tableName in SchemaGraph.tables:
+            SchemaGraph.connectivity[tableName] = list()
+
+        #print SchemaGraph.connectivity
+
+        for table1 in SchemaGraph.tables:
+            list_of_tables_for_t1 = list()
+            list_of_tables_for_t2 = list()
+            for table2 in SchemaGraph.tables:
+                if table1 == table2:
+                    continue
+                else:
+                    if SchemaGraph.getJoinKeys(self, table1, table2):
+                        list_of_tables_for_t1.append(table2)
+                        list_of_tables_for_t2.append(table1)
+            SchemaGraph.connectivity[table1] = list_of_tables_for_t1
+            SchemaGraph.connectivity[table2] = list_of_tables_for_t2
+
+        print "\nprinting connrctivity:"
+        print SchemaGraph.connectivity
+
+    def getJoinKeys(self, table1, table2):
+        table1Keys = SchemaGraph.keys[table1]
+        table2Keys = SchemaGraph.keys[table2]
+
+        if table1Keys == table2Keys:
+            return list()
+        keys1ContainedIn2 = True
+
+        for table1Key in table1Keys:
+            if not table1Key in SchemaGraph.tables[table2]:
+                keys1ContainedIn2 = False
+                break
+
+        if keys1ContainedIn2:
+            return list(table1Keys)
+
+        keys2ContainedIn1 = True
+        for table2Key in table2Keys:
+            if not table2Key in SchemaGraph.tables[table1]:
+                keys2ContainedIn1 = False
+                break
+
+        if keys2ContainedIn1:
+            return list(table2Keys)
+
+        return list()
+
+    def getJoinPath(self, table1, table2):
+        #todo
+        return None
 
 
 
