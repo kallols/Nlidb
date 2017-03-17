@@ -119,7 +119,42 @@ class SchemaGraph :
 
     def getJoinPath(self, table1, table2):
         #todo
-        return None
+        if not(table1 in SchemaGraph.tables) or not(table2 in SchemaGraph.tables):
+            return list()
+
+        visited = dict()
+        for tableName in SchemaGraph.tables:
+            visited[tableName] = False
+
+        prev = dict()
+        queue = list()
+        queue.append(table1)
+        visited[table1] = True
+        found = False
+
+        while queue and not found:
+            tableCurr = queue[0]
+            del queue[0] #remove first
+
+            for tableNext in SchemaGraph.connectivity[tableCurr]:
+                if not visited[tableNext]:
+                    visited[tableNext] = True
+                    queue.append(tableNext)
+                    prev[tableNext] = tableCurr
+                if tableNext == table2:
+                    found = True
+
+        path = list()
+
+        if visited[table2]:
+            tableEnd = table2
+            path.append(tableEnd)
+            while prev[tableEnd]:
+                tableEnd = prev[tableEnd]
+                path.append(tableEnd)
+
+        return path.reverse()
+
 
 
 
