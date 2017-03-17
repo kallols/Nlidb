@@ -13,9 +13,7 @@ class SchemaGraph :
         print "Retrieving schema graph..."
         cursor = connection.cursor()
 
-        cursor.execute("USE db_b130974cs")
-
-        cursor.execute("SHOW TABLES")
+        cursor.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema='public'""")
         table_names = cursor.fetchall()
 
         for table_name in table_names:
@@ -23,8 +21,9 @@ class SchemaGraph :
             SchemaGraph.tables[table_name[0]] = dict()
             SchemaGraph.tableRows[table_name[0]] = dict()
 
-            cursor.execute("SHOW columns FROM %s" % (table_name[0]))
+            cursor.execute("select column_name, data_type from information_schema.columns where table_name = '%s'" % (table_name[0]))
             col_info = cursor.fetchall()
+
             col_name_type_dict = dict()
             for col in col_info:
                 col_name_type_dict[col[0]] = col[1]
@@ -32,7 +31,7 @@ class SchemaGraph :
 
             col_name_values_dict = dict()
             for col in col_info :
-                cursor.execute("SELECT %s FROM %s ORDER BY RAND() LIMIT 20"
+                cursor.execute("SELECT %s FROM %s ORDER BY RANDOM() LIMIT 20"
                                % (col[0], table_name[0]))
                 row = cursor.fetchall()
                 col_name_values_dict[col[0]] = row
@@ -46,76 +45,61 @@ class SchemaGraph :
         print SchemaGraph.tableRows
 
         SchemaGraph.readPrimaryKeys(self, connection)
-        SchemaGraph.findConnectivity(self)
+        SchemaGraph.findConnectivity(self, connection)
 
     def readPrimaryKeys(self, connection):
         SchemaGraph.keys = dict()
         cursor = connection.cursor()
-
+        #get primary keys for each table
         for tableName in SchemaGraph.tables.iterkeys():
-            cursor.execute("SHOW keys FROM %s WHERE Key_name = 'PRIMARY'" %tableName)
+            cursor.execute("""SELECT a.attname, format_type(a.atttypid, a.atttypmod)
+                              AS data_type FROM   pg_index i
+                              JOIN   pg_attribute a ON a.attrelid = i.indrelid
+                              AND a.attnum = ANY(i.indkey)
+                              WHERE  i.indrelid = '%s'::regclass
+                              AND i.indisprimary;""" %tableName)
             rsPrimaryKey = cursor.fetchall()
 
             SchemaGraph.keys[tableName] = dict()
             pkList = list()
 
             for row in rsPrimaryKey:
-                pkList.append(row[4])
+                pkList.append(row[0])
 
             SchemaGraph.keys[tableName] = pkList
         print "\nprinting primary keys..."
         print SchemaGraph.keys
 
-    def findConnectivity(self):
+    def findConnectivity(self, connection):
         SchemaGraph.connectivity = dict()
 
         for tableName in SchemaGraph.tables:
             SchemaGraph.connectivity[tableName] = list()
 
-        #print SchemaGraph.connectivity
+        cursor = connection.cursor()
 
-        for table1 in SchemaGraph.tables:
-            list_of_tables_for_t1 = list()
-            list_of_tables_for_t2 = list()
-            for table2 in SchemaGraph.tables:
-                if table1 == table2:
-                    continue
-                else:
-                    if SchemaGraph.getJoinKeys(self, table1, table2):
-                        list_of_tables_for_t1.append(table2)
-                        list_of_tables_for_t2.append(table1)
-            SchemaGraph.connectivity[table1] = list_of_tables_for_t1
-            SchemaGraph.connectivity[table2] = list_of_tables_for_t2
+        #get foreign keys from table
+        cursor.execute("""SELECT tc.table_name, kcu.column_name, ccu.table_name
+                AS foreign_table_name, ccu.column_name
+                AS foreign_column_name
+                FROM information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                ON tc.constraint_name = kcu.constraint_name
+                JOIN information_schema.constraint_column_usage ccu
+                ON ccu.constraint_name = tc.constraint_name
+                WHERE constraint_type = 'FOREIGN KEY'""")
 
-        print "\nprinting connrctivity:"
+        foreignKeys = cursor.fetchall()
+
+        for foreignKey in foreignKeys:
+            table1 = foreignKey[0]
+            table2 = foreignKey[2]
+            if not table2 in SchemaGraph.connectivity[table1]:
+                SchemaGraph.connectivity[table1].append(table2)
+            if not table1 in SchemaGraph.connectivity[table2]:
+                SchemaGraph.connectivity[table2].append(table1)
+        print "\nprinting connectivity: "
         print SchemaGraph.connectivity
-
-    def getJoinKeys(self, table1, table2):
-        table1Keys = SchemaGraph.keys[table1]
-        table2Keys = SchemaGraph.keys[table2]
-
-        if table1Keys == table2Keys:
-            return list()
-        keys1ContainedIn2 = True
-
-        for table1Key in table1Keys:
-            if not table1Key in SchemaGraph.tables[table2]:
-                keys1ContainedIn2 = False
-                break
-
-        if keys1ContainedIn2:
-            return list(table1Keys)
-
-        keys2ContainedIn1 = True
-        for table2Key in table2Keys:
-            if not table2Key in SchemaGraph.tables[table1]:
-                keys2ContainedIn1 = False
-                break
-
-        if keys2ContainedIn1:
-            return list(table2Keys)
-
-        return list()
 
     def getJoinPath(self, table1, table2):
         #todo
