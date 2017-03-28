@@ -1,5 +1,4 @@
-import mysql.connector
-from mysql.connector import Error
+import psycopg2
 from model.SchemaGraph import SchemaGraph
 
 class Controller:
@@ -10,18 +9,11 @@ class Controller:
     def startConnection(self):
         """ Connect to MySQL database """
         try:
-            conn = mysql.connector.connect(host='127.0.01',
-                                           database='dblp',
-                                           user='root',
-                                           password='Codechef')
-            if conn.is_connected():
-                print('Connected to MySQL database')
+            conn = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='Codechef'")
+        except:
+            print "I am unable to connect to the database"
+        schema = SchemaGraph(conn)
 
-            schema = SchemaGraph(conn)
-            schema.readPrimaryKeys()
-
-        except Error as e:
-            print(e)
 
     def closeConnection(self):
         try:
