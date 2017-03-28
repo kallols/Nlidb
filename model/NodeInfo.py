@@ -1,10 +1,9 @@
 class NodeInfo:
-
     type = None
     value = None
     score = 1.0
 
-    def __init__(self,type,value,score=1.0):
+    def __init__(self, type, value, score=1.0):
         NodeInfo.type = type
         NodeInfo.value = value
         NodeInfo.score = score
@@ -19,7 +18,7 @@ class NodeInfo:
     def getValue(self):
         return self.value
 
-    def reverseScoreComparator(self,a,b):
+    def reverseScoreComparator(self, a, b):
         if a.score < b.score:
             return 1
         elif a.score > b.score:
@@ -44,7 +43,7 @@ class NodeInfo:
 
         if self.type is None:
             if other.type is not None:
-                return  False
+                return False
         elif self.type != other.type:
             return False
         if self.value is None:
@@ -56,12 +55,12 @@ class NodeInfo:
 
     def ExactSameSchema(self, other):
         if self.type is None or \
-            other.getType() is None or \
-            self.value is None or \
-            other.getValue() is None:
+                        other.getType() is None or \
+                        self.value is None or \
+                        other.getValue() is None:
             return False
 
-        if self.type == other.getType()  and self.value == other.getValue():
+        if self.type == other.getType() and self.value == other.getValue():
             return True
 
         return False
@@ -75,7 +74,7 @@ class NodeInfo:
         except ValueError:
             indexOfDot_Other = -1
 
-        try :
+        try:
             indexOfDot = self.value.index('.')
         except ValueError:
             indexOfDot = -1
@@ -83,17 +82,10 @@ class NodeInfo:
         if indexOfDot_Other == -1:
             indexOfDot_Other = other.getValue().length()
 
-        if indexOfDot == -1 :
+        if indexOfDot == -1:
             indexOfDot = self.value.length()
 
         if other.getValue()[0, indexOfDot_Other - 1] == self.value[0, indexOfDot - 1]:
             return True
 
         return False
-
-
-
-
-
-
-
