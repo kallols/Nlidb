@@ -9,18 +9,11 @@ class Controller:
     def startConnection(self):
         """ Connect to MySQL database """
         try:
-            conn = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='Codechef'")
+            self.conn = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='ashwin2048'")
         except:
             print "I am unable to connect to the database"
-        schema = SchemaGraph(conn)
+        schema = SchemaGraph(self.conn)
 
-
-    def closeConnection(self):
-        try:
-            conn.close()
-        except Error as e:
-            print(e)
-        print("Database connection closed")
 
 controller = Controller()
 controller.startConnection()
