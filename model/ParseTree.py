@@ -66,7 +66,7 @@ class ParseTree:
             if i.getWord() == word:
                 return ind
             ind += 1
-        return None
+        return ind
 
     def size(self):
         return len(self.root.getNodesArray())
