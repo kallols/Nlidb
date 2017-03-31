@@ -2,6 +2,10 @@ from nltk.tree import ParentedTree
 from nltk.tree import Tree
 
 from Node import Node
+from model.NLParser import NLParser
+from model.NodeInfo import NodeInfo
+from model.SQLTranslator import SQLTranslator
+from model.SyntacticEvaluator import SyntacticEvaluator
 
 
 class ParseTree:
@@ -61,7 +65,7 @@ class ParseTree:
                 print [word.getWord() for word in n.getChildren()]
 
     def findNodeInd(self, word):
-        ind = 0;
+        ind = 0
         for i in self.nodes:
             if i.getWord() == word:
                 return ind
@@ -424,6 +428,6 @@ class ParseTree:
 
 
 
-
+#
 # a = NLParser()
 # ParseTree(text="Return the number of authors who published theory papers before 1980 .", parser=a)

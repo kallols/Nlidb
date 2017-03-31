@@ -65,4 +65,5 @@ class NodeMapper:
 
         result.append(valueNodes) #doubt : result.addAll() vs result.append()
         result.append(NodeInfo("UNKNOWN", "meaningless", 1.0))
+        print "printing NodeMapper.getNodeInfoChoices() : "+sorted(result, cmp = NodeInfo.reverseScoreComparator())
         return sorted(result, cmp = NodeInfo.reverseScoreComparator())
