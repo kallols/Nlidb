@@ -145,14 +145,14 @@ class Node:
             s = s + "(" + self.info.getType() + ":" + self.info.getValue() + ")"
         return s
 
-
-nodes = list()
-nodes.append(Node("a", "d", 0))
-nodes.append(Node("b", "d", 1))
-nodes.append(Node("c", "d", 2))
-
-nodes[0].setChild(nodes[1])
-nodes.append(Node("e", "d", 3))
-for n in nodes:
-    print n.getWord()
-    print [word.getWord() for word in n.getChildren()]
+#
+# nodes = list()
+# nodes.append(Node("a", "d", 0))
+# nodes.append(Node("b", "d", 1))
+# nodes.append(Node("c", "d", 2))
+#
+# nodes[0].setChild(nodes[1])
+# nodes.append(Node("e", "d", 3))
+# for n in nodes:
+#     print n.getWord()
+#     print [word.getWord() for word in n.getChildren()]

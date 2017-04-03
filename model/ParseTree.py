@@ -2,6 +2,10 @@ from nltk.tree import ParentedTree
 from nltk.tree import Tree
 
 from Node import Node
+from model import TreeAdjustor
+from model.NodeInfo import NodeInfo
+from model.SQLTranslator import SQLTranslator
+from model.SyntacticEvaluator import SyntacticEvaluator
 
 
 class ParseTree:
@@ -9,10 +13,9 @@ class ParseTree:
     root = None
     nodes = list()
 
-    #TODO: This is created for the priority q . check if its working
-    def  __lt__(t1,t2):
+    # TODO: This is created for the priority q . check if its working
+    def __lt__(t1, t2):
         return - t1.getScore() + t2.getScore()
-
 
     def __init__(self, text=None, parser=None, node=None, other=None):
 
@@ -61,7 +64,7 @@ class ParseTree:
                 print [word.getWord() for word in n.getChildren()]
 
     def findNodeInd(self, word):
-        ind = 0;
+        ind = 0
         for i in self.nodes:
             if i.getWord() == word:
                 return ind
@@ -353,30 +356,30 @@ class ParseTree:
 
     def mergeLNQN(self):
         nodes = self.root.genNodesArray();
-        for i in range( 0, self.size()):
+        for i in range(0, self.size()):
             if (nodes[i].getInfo().getType().equals("LN") or nodes[i].getInfo().getType().equals("QN")):
-                word = "("+nodes[i].getWord()+")";
-                parentWord = nodes[i].getParent().getWord()+word;
+                word = "(" + nodes[i].getWord() + ")";
+                parentWord = nodes[i].getParent().getWord() + word;
                 nodes[i].getParent().setWord(parentWord);
                 self.removeNode(nodes[i]);
 
         tree = ParseTree(self.root);
         return tree
 
-    def removeNode (self,curNode):
+    def removeNode(self, curNode):
         curNode.getParent().getChildren().remove(curNode);
-        for child in  curNode.getChildren():
-		    child.setParent(curNode.getParent());
-		    curNode.getParent().setChild(child);
+        for child in curNode.getChildren():
+            child.setParent(curNode.getParent());
+            curNode.getParent().setChild(child);
 
     def addON(self):
-		root = self.root.clone();
-		on = Node (0,"equals", "postag");
-		on.info =NodeInfo ("ON", "=");
-		root.setChild(on);
-		on.setParent(root);
-		tree = ParseTree(root);
-		return tree
+        root = self.root.clone();
+        on = Node(0, "equals", "postag");
+        on.info = NodeInfo("ON", "=");
+        root.setChild(on);
+        on.setParent(root);
+        tree = ParseTree(root);
+        return tree
 
     def compare(self, t1, t2):
         if (t1.getScore() != t2.getScore()):
@@ -386,44 +389,40 @@ class ParseTree:
 
     def getAdjustedTrees(self):
         result = TreeAdjustor.getAdjustedTrees(self)
-        sorted(result,cmp=self.compare())
+        sorted(result, cmp=self.compare())
         return result.subList(0, 4)
 
-    def translateToSQL(self,schema) :
+    def translateToSQL(self, schema):
 
-        translator = SQLTranslator(self.root, schema);
-        return translator.getResult();
+        translator = SQLTranslator(self.root, schema)
+        return translator.getResult()
 
-    def hashCode(self) :
-	    prime = 31
-	    result = 17
-	    result = prime*result + (0 if self.root is None else  self.root.hashCode())
-	    return result;
+    def hashCode(self):
+        prime = 31
+        result = 17
+        result = prime * result + (0 if self.root is None else  self.root.hashCode())
+        return result;
 
-    def equals(self ,obj):
+    def equals(self, obj):
         if (self == obj):
             return True;
-        if (obj is None) :
-	    	return False;
+        if (obj is None):
+            return False;
         if (self.__class__ != obj.__class):
             return False
 
-        if (self.root is None) :
+        if (self.root is None):
             if (obj.root is not None):
                 return False
         elif (not self.root.equals(obj.root)):
             return False;
         return True;
 
-
-#### TODO : public class ParseTreeIterator implements Iterator<Node>
+    #### TODO : public class ParseTreeIterator implements Iterator<Node>
 
     def getScore(self):
-		return - SyntacticEvaluator.numberOfInvalidNodes(self);
+        return - SyntacticEvaluator.numberOfInvalidNodes(self);
 
-
-
-
-
+#
 # a = NLParser()
 # ParseTree(text="Return the number of authors who published theory papers before 1980 .", parser=a)

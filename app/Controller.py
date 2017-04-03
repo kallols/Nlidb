@@ -1,19 +1,141 @@
 import psycopg2
 from model.SchemaGraph import SchemaGraph
+from model.NodeMapper import NodeMapper
+from model.ParseTree import ParseTree
+from model.NLParser import NLParser
+
 
 class Controller:
     conn = None
-    def __init__(self):
-        pass
+    nodeMapper = None
+    parser = None
+    schema = None
+    processing = False
+    parseTree = None
+    mappingNodes = False
+    node = None
+    view = None
+    selectingTree = False
+    treeChoices = []
+    query = ""
+
+    def __init__(self, userView):
+        self.startConnection()
+        self.nodeMapper = NodeMapper()
+        self.parser = NLParser()
+        self.view = userView
+        print "Controller initialized."
 
     def startConnection(self):
         """ Connect to MySQL database """
         try:
-            self.conn = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='ashwin2048'")
+            self.conn = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='Codechef'")
         except:
             print "I am unable to connect to the database"
-        schema = SchemaGraph(self.conn)
+        print "connected to database..."
+        self.schema = SchemaGraph(self.conn)
 
+    def closeConnection(self):
+        try:
+            conn.close()
+        except Error as e:
+            print(e)
+        print("Database connection closed")
 
-controller = Controller()
-controller.startConnection()
+    def setChoicesOnView(self, choices): #TODO
+        view.setDisplay("Mapping nodes: \n" + parseTree.getSentence() + "\n");
+        view.appendDisplay("Currently on: " + node);
+        #view.setChoices(FXCollections.observableArrayList(choices)); TODO doubt here
+        self.view.setChoices(choices)
+
+    def finishNodesMapping(self):
+        print "in Finish Node Mapping...\n"
+        self.view.setDisplay("Nodes mapped.\n" + parseTree.getSentence())
+        self.mappingNodes = False
+        self.view.removeChoiceBoxButton()
+        self.processAfterNodesMapping()
+        print "Finish Node Mapping Done!...\n"
+
+    def startMappingNodes(self): #TODO
+        print "in Start Mapping Nodes...\n"
+        if self.mappingNodes:
+            return
+        self.mappingNodes = True
+
+        # iter = parseTree.iterator();
+        # if (!iter.hasNext()) {
+        #     finishNodesMapping();
+        #     return;
+        # }
+        # node = iter.next();
+        choices = self.nodeMapper.getNodeInfoChoices(node, self.schema)
+        if len(choices) == 1:
+            self.chooseNode(choices[0])
+        else:
+            self.setChoicesOnView(choices)
+        print "Start Mapping Nodes Done!...\n"
+
+    def chooseNode(self, info):
+        print "in Choose Node...\n"
+        if not self.mappingNodes:
+            return
+
+        self.node.setInfo(info)
+        #TODO
+        # if (!iter.hasNext()) {
+        #     finishNodesMapping();
+        #     return
+        # }
+        # node = iter.next()
+        choices = self.nodeMapper.getNodeInfoChoices(node, self.schema)
+        if len(choices) == 1:
+            self.chooseNode(choices[0])
+        else:
+            self.setChoicesOnView(choices)
+        print "Choose Node Done!...\n"
+
+    def startTreeSelection(self):
+        if selectingTree:
+            return
+        self.view.showTreesChoice()
+        self.selectingTree = True
+        self.treeChoices = self.parseTree.getAdjustedTrees()
+
+    def showTree(self, index):
+        self.view.setDisplay(self.treeChoices[0])
+
+    def chooseTree(self, index):
+        self.parseTree = self.treeChoices[index]
+        self.finishTreeSelection()
+
+    def finishTreeSelection(self):
+        self.selectingTree = False
+        self.view.removeTreesChoices()
+        self.processAfterTreeSelection()
+
+    def processAfterTreeSelection(self):
+        print "The tree before implicit nodes insertion: %s\n"%self.parseTree
+        self.parseTree.insertImplicitNodes()
+        print "Going to do translation for tree: %s\n"%self.parseTree
+        self.query = parseTree.translateToSQL(self.schema)
+        self.view.setDisplay(self.query.toString())
+        self.processing = False
+
+    def processAfterNodesMapping(self):
+        print "Going to remove meaningless nodes for tree: "
+        print self.parseTree
+        self.parseTree.removeMeaninglessNodes()
+        print "###"
+        self.parseTree.mergeLNQN()
+        print "After mergeLNQn"
+        self.startTreeSelection()
+        print "After startTreeSelection..."
+
+    def processNaturalLanguage(self, input):
+        if self.processing:
+            print "\nCurrently processing a sentence!\n"
+        else:
+            self.processing = True
+            self.parseTree = ParseTree(input, parser=self.parser)
+            self.startMappingNodes()
+
