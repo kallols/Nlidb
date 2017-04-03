@@ -18,6 +18,7 @@ class Controller:
     selectingTree = False
     treeChoices = []
     query = ""
+    iter = None
 
     def __init__(self, userView):
         self.startConnection()
@@ -37,20 +38,22 @@ class Controller:
 
     def closeConnection(self):
         try:
-            conn.close()
-        except Error as e:
-            print(e)
+            self.conn.close()
+        except:
+            pass
+
+
         print("Database connection closed")
 
     def setChoicesOnView(self, choices): #TODO
-        view.setDisplay("Mapping nodes: \n" + parseTree.getSentence() + "\n");
-        view.appendDisplay("Currently on: " + node);
+        self.view.setDisplay("Mapping nodes: \n" + self.parseTree.getSentence() + "\n");
+        self.view.appendDisplay("Currently on: " + self.node);
         #view.setChoices(FXCollections.observableArrayList(choices)); TODO doubt here
         self.view.setChoices(choices)
 
     def finishNodesMapping(self):
         print "in Finish Node Mapping...\n"
-        self.view.setDisplay("Nodes mapped.\n" + parseTree.getSentence())
+        self.view.setDisplay("Nodes mapped.\n" + self.parseTree.getSentence())
         self.mappingNodes = False
         self.view.removeChoiceBoxButton()
         self.processAfterNodesMapping()
@@ -62,12 +65,12 @@ class Controller:
             return
         self.mappingNodes = True
 
-        # iter = parseTree.iterator();
-        # if (!iter.hasNext()) {
-        #     finishNodesMapping();
-        #     return;
-        # }
-        # node = iter.next();
+        self.iter = self.parseTree.iterator()
+        if not (self.iter.hasNext()) :
+            self.finishNodesMapping()
+            return
+
+        node = self.iter.getNext()
         choices = self.nodeMapper.getNodeInfoChoices(node, self.schema)
         if len(choices) == 1:
             self.chooseNode(choices[0])
@@ -82,11 +85,11 @@ class Controller:
 
         self.node.setInfo(info)
         #TODO
-        # if (!iter.hasNext()) {
-        #     finishNodesMapping();
-        #     return
-        # }
-        # node = iter.next()
+        if not(self.iter.hasNext()) :
+            self.finishNodesMapping();
+            return
+
+        node = self.iter.getNext()
         choices = self.nodeMapper.getNodeInfoChoices(node, self.schema)
         if len(choices) == 1:
             self.chooseNode(choices[0])
@@ -95,7 +98,7 @@ class Controller:
         print "Choose Node Done!...\n"
 
     def startTreeSelection(self):
-        if selectingTree:
+        if self.selectingTree:
             return
         self.view.showTreesChoice()
         self.selectingTree = True
@@ -117,7 +120,7 @@ class Controller:
         print "The tree before implicit nodes insertion: %s\n"%self.parseTree
         self.parseTree.insertImplicitNodes()
         print "Going to do translation for tree: %s\n"%self.parseTree
-        self.query = parseTree.translateToSQL(self.schema)
+        self.query = self.parseTree.translateToSQL(self.schema)
         self.view.setDisplay(self.query.toString())
         self.processing = False
 

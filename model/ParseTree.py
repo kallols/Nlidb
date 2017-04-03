@@ -423,6 +423,29 @@ class ParseTree:
     def getScore(self):
         return - SyntacticEvaluator.numberOfInvalidNodes(self);
 
+    def iterator(self):
+        return self.ParseTreeIterator()
+
+    class ParseTreeIterator:
+        stack = list()
+
+        def __init__(self):
+            self.stack.insert(0,ParseTree.root)
+
+        def hasNext(self):
+            if len(self.stack) == 0:
+                return False
+            return True
+
+        def getNext(self):
+            curr = self.stack.pop(0)
+            children = curr.getChildren()
+            for i in range(children.size(),-1.-1):
+                self.stack.insert(0,children[i])
+            return curr
+
+
+
 #
 # a = NLParser()
 # ParseTree(text="Return the number of authors who published theory papers before 1980 .", parser=a)
