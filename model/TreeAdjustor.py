@@ -1,19 +1,21 @@
 from Queue import PriorityQueue
-from .SyntacticEvaluator import SyntacticEvaluator
+from SyntacticEvaluator import SyntacticEvaluator
 
-class TreeAdjuster:
+class TreeAdjustor:
     MAX_EDIT = 5
 
     def __init__(self):
         pass
-
-    def find(self, tree, targetNode):
+    
+    @staticmethod
+    def find(tree, targetNode):
         for node in tree:
             if node.equals(targetNode):
                 return node
         return None
 
-    def swap(self, parent, child):
+    @staticmethod
+    def swap( parent, child):
         childInfo = child.info
         childWord = child.word
         childPosTag = child.posTag
@@ -24,7 +26,8 @@ class TreeAdjuster:
         parent.word = childWord
         parent.posTag = childPosTag
 
-    def makeSibling(self, target, child):
+    @staticmethod
+    def makeSibling( target, child):
         children = target.getChildren()
         target.children = list()
         for anyChild in children:
@@ -34,7 +37,8 @@ class TreeAdjuster:
                 target.parent.children.append(child)
                 child.parent = target.parent
 
-    def makeChild(self, target, sibling):
+    @staticmethod
+    def makeChild( target, sibling):
         siblings = target.parent.children
         target.parent.children = list()
         for anySibling in siblings:
@@ -44,74 +48,75 @@ class TreeAdjuster:
         target.children.append(sibling)
         sibling.parent = target
 
-    def adjust(self, tree, target=None):
-        from .ParseTree import ParseTree
-        if target is None:
+    @staticmethod
+    def adjust( tree, target=None):
+        from ParseTree import ParseTree
+        if target is not None:
             adjusted = list()
             if target.parent is None:
                 return adjusted
 
             for child in target.getChildren():
                 tempTree = ParseTree(tree)
-                self.swap(self.find(tempTree, target), self.find(tempTree, child))
+                TreeAdjustor.swap(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
                 adjusted.append(tempTree)
 
             for child in target.getChildren():
                 tempTree = ParseTree(tree)
-                self.makeSibling(self.find(tempTree, target), self.find(tempTree, child))
+                TreeAdjustor.makeSibling(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
                 adjusted.append(tempTree)
 
             for sibling in target.parent.getChildren():
                 if (sibling == target):
                     continue
                 tempTree = ParseTree(tree)
-                self.makeChild(self.find(tempTree, target), self.find(tempTree, sibling))
+                TreeAdjustor.makeChild(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, sibling))
                 adjusted.append(tempTree);
 
             if (target.getChildren().size() >= 2):
                 children = target.getChildren()
                 for i in range(1, children.size()):
                     tempTree = ParseTree(tree)
-                    self.swap(self.find(tempTree, children[0]),
-                              self.find(tempTree, children[i]));
+                    TreeAdjustor.swap(TreeAdjustor.find(tempTree, children[0]),
+                              TreeAdjustor.find(tempTree, children[i]));
                     adjusted.append(tempTree);
 
             return adjusted
         else:
             treeList = list()
             for node in tree:
-                treeList.extend(self.adjust(tree, node))
+                treeList.extend(TreeAdjustor.adjust(tree, node))
             return list(treeList)
 
-
-    def  getAdjustedTrees(self, tree):
+    @staticmethod
+    def getAdjustedTrees( tree):
         results = list()
         queue = PriorityQueue()
         #TODO :check if p queue is working properly
         H = dict()
         queue.put(tree)
         results.append(tree);
-        H[tree.hashCode()] = tree
+        H[tree.__hash__()] = tree
         tree.setEdit(0);
 
         treeWithON = tree.addON()
         queue.put(treeWithON);
         results.append(treeWithON);
-        H[treeWithON.hashCode()]  = treeWithON
+        H[treeWithON.__hash__()]  = treeWithON
         treeWithON.setEdit(0)
 
         while not queue.empty():
             oriTree = queue.get()
             queue.put(oriTree)
 
-            if (oriTree.getEdit() >= self.MAX_EDIT):
+            if (oriTree.getEdit() >= TreeAdjustor.MAX_EDIT):
                 continue
 
-            treeList = self.adjust(oriTree)
+            treeList = TreeAdjustor.adjust(oriTree)
 
             tmp = SyntacticEvaluator()
 
-            numInvalidNodes = SyntacticEvaluator.numberOfInvalidNodes(oriTree)
+            numInvalidNodes = SyntacticEvaluator().numberOfInvalidNodes(oriTree)
 
             for i in range(0,len(treeList)):
                 currentTree = treeList[i]

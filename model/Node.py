@@ -90,18 +90,18 @@ class Node:
 
         return nodesList
 
-    def hashCode(self):
+    def __hash__(self):
         prime = 31
         result = 17
 
         result = prime * result + self.index
-        result = prime * result + (0 if (self.posTag is None) else self.posTag.hashCode())
-        result = prime * result + (0 if (self.word is None) else self.word.hashCode())
-        result = prime * result + (0 if (self.info is None) else self.info.hashCode())
+        result = prime * result + (0 if (self.posTag is None) else hash(self.posTag))
+        result = prime * result + (0 if (self.word is None) else hash(self.word))
+        result = prime * result + (0 if (self.info is None) else hash(self.info))
 
         if self.children is not None:
             for child in self.children:
-                result = prime * result + child.hashCode()
+                result = prime * result + child.__hash__()
 
         return result
 
