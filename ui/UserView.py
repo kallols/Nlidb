@@ -1,4 +1,5 @@
 from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import QVariant
 
 from app.Controller import Controller
 
@@ -47,7 +48,7 @@ class Ui_MainWindow(object):
         self.display.setText(text)
 
     def appendDisplay(self, text):
-        self.display.setText(self.display.text()+text)
+        self.display.setText(self.display.toPlainText()+text)
 
     def showNodesChoice(self):
         self.choiceBox.show()
@@ -139,7 +140,12 @@ class Ui_MainWindow(object):
         self.label.setGeometry(QtCore.QRect(330, 0, 261, 22))
         self.label.setObjectName(_fromUtf8("label"))
 
-        self.display = QtGui.QLabel(self.centralwidget)
+        # self.display = QtGui.QLabel(self.centralwidget)
+        # self.label.setGeometry(QtCore.QRect(330, 0, 261, 22))
+        # self.display.setObjectName(_fromUtf8("display"))
+        # self.display.setWordWrap(True)
+        self.display = QtGui.QTextEdit(self.centralwidget)
+        self.display.setGeometry(QtCore.QRect(40, 310, 381, 171))
         self.display.setObjectName(_fromUtf8("display"))
 
         MainWindow.setCentralWidget(self.centralwidget)

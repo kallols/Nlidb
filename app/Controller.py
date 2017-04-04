@@ -46,8 +46,14 @@ class Controller:
         print("Database connection closed")
 
     def setChoicesOnView(self, choices): #TODO
-        #self.view.setDisplay("Mapping nodes: \n" + self.parseTree.getSentence() + "\n");
-        self.view.appendDisplay("Currently on: " + self.node.getWord());
+        sb = []
+        sb.append("Mapping nodes: \n")
+        sb.append(self.parseTree.getSentence())
+        self.view.setDisplay(''.join(sb))
+        sb = []
+        sb.append("Currently on: ")
+        sb.append(self.node.getWord())
+        self.view.appendDisplay( ''.join(sb))
         #view.setChoices(FXCollections.observableArrayList(choices)); TODO doubt here
         self.view.setChoices(choices)
 
@@ -88,7 +94,7 @@ class Controller:
             return
 
         self.node.setInfo(info)
-        #TODO
+
         if not(self.iter.hasNext()) :
             self.finishNodesMapping();
             return
@@ -131,6 +137,9 @@ class Controller:
     def processAfterNodesMapping(self):
         print "Going to remove meaningless nodes for tree: "
         print self.parseTree
+        for n in self.parseTree.nodes:
+            print n.getWord()
+            print [word.getWord() for word in n.getChildren()]
         self.parseTree.removeMeaningLessNodes()
         print "###"
         self.parseTree.mergeLNQN()
