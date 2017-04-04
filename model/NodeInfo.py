@@ -42,8 +42,8 @@ class NodeInfo:
         return result
 
     def __eq__(self, other):
-        if self == other:
-            return True
+        # if self == other:
+        #     return True
         if other is None:
             return False
         if type(self) != type(other):

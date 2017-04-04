@@ -37,12 +37,14 @@ class Ui_MainWindow(object):
     ctrl = None
     nlInput = ""
     userView = None
+    choiceList = []
 
     def __init__(self):
         self.userView = self
         self.ctrl = Controller(self.userView)
         # self.nlInput = raw_input("Enter Natural Language Input:\n")
         self.nlInput = "Return the number of authors who published theory papers before 1980 ."
+        self.choiceList =[]
 
     def setDisplay(self, text):
         self.display.setText(text)
@@ -59,9 +61,21 @@ class Ui_MainWindow(object):
         self.btnConfirmChoice.hide()
 
     def btnConfirmChoiceClick(self, btn, chBox):
-        self.ctrl.chooseNode(self.getChoice())
+        self.ctrl.chooseNode(self.getNodeInfoObject(self.getChoice()))
+
+    def getNodeInfoObject(self, string):
+        nodeInfo = string.split(' ')
+        type = nodeInfo[0]
+        value = nodeInfo[2]
+        return self.findNodeInfo(type, value)
+
+    def findNodeInfo(self, type, value):
+        for nodeInfo in self.choiceList:
+            if nodeInfo.getType() == type and nodeInfo.getValue() == value:
+                return nodeInfo
 
     def setChoices(self, choices):
+        self.choiceList = choices
         for choice in choices:
             self.choiceBox.addItem(self.userView.createOptionMsg(choice.type, choice.value))
         self.choiceBox.setCurrentIndex(0)

@@ -46,33 +46,36 @@ class NodeMapper:
             return 0
 
     def getNodeInfoChoices(self , node, schema):
-        result = list() #final output
+        result = set() #final output
 
         if node.getWord() == "ROOT":
-            result.append(NodeInfo("ROOT", "ROOT"))
-            return result
+            result.add(NodeInfo("ROOT", "ROOT"))
+            return list(result)
 
-        valueNodes = list()
+        valueNodes = set()
         word = node.getWord().lower()
 
         if word in self.map:
-            result.append( self.map[word] )
-            return result
+            result.add( self.map[word] )
+            return list(result)
 
         for tableName in schema.getTableNames():
-            result.append(NodeInfo("NN", tableName, self.wordSimilarity.getSimilarity(word, tableName)))
+            result.add(NodeInfo("NN", tableName, self.wordSimilarity.getSimilarity(word, tableName)))
 
             for colName in schema.getColumns(tableName):
-                result.append(NodeInfo("NN", tableName + "." + colName, self.wordSimilarity.getSimilarity(word, colName)))
+                result.add(NodeInfo("NN", tableName + "." + colName, self.wordSimilarity.getSimilarity(word, colName)))
 
                 for value in schema.getValues(tableName, colName):
                     if (word is None) or (value is None):
                         print "Comparing %s and %s"%(word, value)
                         print "In table %s column %s"%(tableName, colName)
 
-                    valueNodes.append(NodeInfo("VN", tableName+"."+colName, self.wordSimilarity.getSimilarity(word, value)))
+                    valueNodes.add(NodeInfo("VN", tableName+"."+colName, self.wordSimilarity.getSimilarity(word, value)))
 
-        result.extend(valueNodes)
-        result.append(NodeInfo("UNKNOWN", "meaningless", 1.0))
-        list1 = sorted(result, cmp = self.reverseScoreComparator, reverse=True)
-        return sorted(result, cmp = self.reverseScoreComparator, reverse=True)
+        for nodeInfo in valueNodes:
+            result.add(nodeInfo)
+
+        result.add(NodeInfo("UNKNOWN", "meaningless", 1.0))
+        result = list(result)
+        list1 = sorted(result, cmp = self.reverseScoreComparator)
+        return sorted(result, cmp = self.reverseScoreComparator)

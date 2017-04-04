@@ -2,7 +2,7 @@ from nltk.tree import ParentedTree
 from nltk.tree import Tree
 
 from Node import Node
-from model import TreeAdjustor
+from model.TreeAdjustor import TreeAdjustor
 from model.NodeInfo import NodeInfo
 from model.SQLTranslator import SQLTranslator
 from model.SyntacticEvaluator import SyntacticEvaluator
@@ -28,10 +28,12 @@ class ParseTree:
                 if type(subtree) == Tree:
                     childInd = self.findNodeInd(subtree.label())
                     self.nodes[parInd].setChild(self.nodes[childInd])
+                    self.nodes[childInd].setParent(self.nodes[parInd])
                     traverseTree(subtree)
                 else:
                     childInd = self.findNodeInd(subtree.encode('ascii', 'ignore'))
                     self.nodes[parInd].setChild(self.nodes[childInd])
+                    self.nodes[childInd].setParent(self.nodes[parInd])
                     print type(subtree.encode('ascii', 'ignore'))
 
         if text is not None and parser is not None and node is None and other is None:
@@ -75,7 +77,7 @@ class ParseTree:
         return None
 
     def size(self):
-        return len(self.root.getNodesArray())
+        return len(self.root.genNodesArray())
 
     def getEdit(self):
         return self.edit
@@ -91,7 +93,7 @@ class ParseTree:
         for child in currChildren:
             self.removeMeaninglessNodes2(child)
 
-        if curr != curr.equals(self.root) and curr.getInfo().getType().equals("UNKNOWN"):
+        if (not curr.equals(self.root)) and curr.getInfo().getType() == "UNKNOWN":
             curr.parent.getChildren().remove(curr)
             for child in curr.getChildren():
                 curr.parent.getChildren().add(child)
@@ -114,7 +116,7 @@ class ParseTree:
 
         IndexOfSN = 0
         for i in range(0, len(childrenOfRoot)):
-            if (childrenOfRoot.get(i).getInfo().getType().equals("SN")):
+            if (childrenOfRoot[i].getInfo().getType() == "SN"):
                 IndexOfSN = i;
 
         # start from the name node
@@ -125,7 +127,7 @@ class ParseTree:
 
         for i in range(0, len(SN_children)):
 
-            if (SN_children.get(i).getInfo().getType().equals("NN")):
+            if (SN_children[i].getInfo().getType() == "NN"):
                 IndexOfSN_NN = i;
                 break
 
@@ -139,7 +141,7 @@ class ParseTree:
 
             if i != IndexOfSN:
 
-                nodes_SN_NN = childrenOfRoot.get(i).genNodesArray()
+                nodes_SN_NN = childrenOfRoot[i].genNodesArray()
                 indexOfAppendedNode = self.nameNodeToBeAppended(nodes_SN_NN)
 
                 if indexOfAppendedNode != -1:
@@ -201,7 +203,7 @@ class ParseTree:
 
                                 for j in range(len(nodes) - 1, self.endOfLeftBranch(nodes), -1):
 
-                                    if (nodes[j].getInfo().getType().equals("FN")):
+                                    if (nodes[j].getInfo().getType() == "FN"):
                                         indexOfNewRightCN = j + 1;
                                         insertAroundFN = True;
                                         break;
@@ -239,7 +241,7 @@ class ParseTree:
 
                         for j in range(0, len(NV_children_left)):
 
-                            nodes_new = childrenOfRoot.get(i).genNodesArray();
+                            nodes_new = childrenOfRoot[i].genNodesArray();
                             indexOfRightCoreNode = self.coreNode(nodes_new, False);
                             NV_children_right = nodes_new[indexOfRightCoreNode].getChildren();
                             found_NV = False;
@@ -276,12 +278,12 @@ class ParseTree:
 
                     print "Phase 4, insert missing function node"
 
-                    nodes_final_temp = childrenOfRoot.get(i).genNodesArray();
+                    nodes_final_temp = childrenOfRoot[i].genNodesArray();
                     indexOfLeftFN_Tail = -1;
 
                     for j in range(indexOfLeftCoreNode, -1, -1):
 
-                        if (nodes_final_temp[j].getInfo().getType().equals("FN")):
+                        if (nodes_final_temp[j].getInfo().getType() == "FN"):
                             indexOfLeftFN_Tail = j;
                             break;
 
@@ -289,7 +291,7 @@ class ParseTree:
 
                         for k in range(1, indexOfLeftFN_Tail + 1):
 
-                            nodes_final = childrenOfRoot.get(i).genNodesArray();
+                            nodes_final = childrenOfRoot[i].genNodesArray();
                             indexOfRightCoreNode = self.coreNode(nodes_final, False);
 
                             found_FN = False;
@@ -313,7 +315,7 @@ class ParseTree:
     def IndexToInsertCN(self, nodes):
         for i in range(self.endOfLeftBranch(nodes) + 1, len(nodes)):
 
-            if (nodes[i].getInfo().getType().equals("NN")):
+            if (nodes[i].getInfo().getType() == "NN"):
                 return i
 
         return -1
@@ -322,7 +324,7 @@ class ParseTree:
 
         for i in range(self.endOfLeftBranch(nodes), 0, -1):
 
-            if (nodes[i].getInfo().getType().equals("NN")):
+            if (nodes[i].getInfo().getType() == "NN"):
                 return i
 
         return -1
@@ -353,7 +355,7 @@ class ParseTree:
 
         for i in range(startIndex, endIndex):
 
-            if (nodes[i].getInfo().getType().equals("NN")):
+            if (nodes[i].getInfo().getType() == "NN"):
                 return i
 
         return -1;
@@ -361,7 +363,7 @@ class ParseTree:
     def mergeLNQN(self):
         nodes = self.root.genNodesArray();
         for i in range(0, self.size()):
-            if (nodes[i].getInfo().getType().equals("LN") or nodes[i].getInfo().getType().equals("QN")):
+            if (nodes[i].getInfo().getType() == "LN") or nodes[i].getInfo().getType() == "QN":
                 word = "(" + nodes[i].getWord() + ")";
                 parentWord = nodes[i].getParent().getWord() + word;
                 nodes[i].getParent().setWord(parentWord);
@@ -393,7 +395,7 @@ class ParseTree:
 
     def getAdjustedTrees(self):
         result = TreeAdjustor.getAdjustedTrees(self)
-        sorted(result, cmp=self.compare())
+        sorted(result, cmp=self.compare)
         return result.subList(0, 4)
 
     def translateToSQL(self, schema):
