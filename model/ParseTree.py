@@ -98,7 +98,6 @@ class ParseTree:
                 child.parent = curr.parent
 
     def removeMeaningLessNodes(self):
-        childrenList = []
         childrenList = self.root.getChildren()
         if childrenList[0].getInfo is None:
             print "ERR! Node info not yet mapped!"
@@ -425,8 +424,12 @@ class ParseTree:
 
     #### TODO : public class ParseTreeIterator implements Iterator<Node>
     def getSentence(self):
-        #TODO
-        return
+        sb = []
+        for n in self.nodes:
+            sb.append(n.getWord())
+            sb.append(" ")
+            sb.append("\n")
+        return ''.join(sb)
 
     def getScore(self):
         return - SyntacticEvaluator.numberOfInvalidNodes(self);
