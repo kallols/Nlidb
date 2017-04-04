@@ -1,5 +1,6 @@
 from model.NodeInfo import NodeInfo
 from model.WordSimilarity import WordSimilarity
+from operator import attrgetter
 
 
 class NodeMapper:
@@ -9,32 +10,40 @@ class NodeMapper:
 
     def __init__(self):
         self.wordSimilarity = WordSimilarity()
-        map = dict()
+        self.map = dict()
 
-        map["return"] = NodeInfo("SN", "SELECT") # Select Node
+        self.map["return"] = NodeInfo("SN", "SELECT") # Select Node
 
-        map["equals"]= NodeInfo("ON", "=") # Operator Node
-        map["less"] = NodeInfo("ON", "<")
-        map["greater"] = NodeInfo("ON", ">")
-        map["not"] = NodeInfo("ON", "!=")
-        map["before"] = NodeInfo("ON", "<")
-        map["after"] = NodeInfo("ON", ">")
-        map["more"] = NodeInfo("ON", ">")
-        map["older"] = NodeInfo("ON", ">")
-        map["newer"] = NodeInfo("ON", "<")
+        self.map["equals"]= NodeInfo("ON", "=") # Operator Node
+        self.map["less"] = NodeInfo("ON", "<")
+        self.map["greater"] = NodeInfo("ON", ">")
+        self.map["not"] = NodeInfo("ON", "!=")
+        self.map["before"] = NodeInfo("ON", "<")
+        self.map["after"] = NodeInfo("ON", ">")
+        self.map["more"] = NodeInfo("ON", ">")
+        self.map["older"] = NodeInfo("ON", ">")
+        self.map["newer"] = NodeInfo("ON", "<")
 
-        map["fn"] = NodeInfo("FN", "AVG") # Function Node
-        map["average"] = NodeInfo("FN", "AVG")
-        map["most"] = NodeInfo("FN", "MAX")
-        map["total"] = NodeInfo("FN", "SUM")
-        map["number"] = NodeInfo("FN", "COUNT")
+        self.map["fn"] = NodeInfo("FN", "AVG") # Function Node
+        self.map["average"] = NodeInfo("FN", "AVG")
+        self.map["most"] = NodeInfo("FN", "MAX")
+        self.map["total"] = NodeInfo("FN", "SUM")
+        self.map["number"] = NodeInfo("FN", "COUNT")
 
-        map["all"] = NodeInfo("QN", "ALL") # Quantifier Node
-        map["any"] = NodeInfo("QN", "ANY")
-        map["each"] = NodeInfo("QN", "EACH")
+        self.map["all"] = NodeInfo("QN", "ALL") # Quantifier Node
+        self.map["any"] = NodeInfo("QN", "ANY")
+        self.map["each"] = NodeInfo("QN", "EACH")
 
-        map["and"] = NodeInfo("LN", "AND") # Logic Node
-        map["or"] = NodeInfo("LN", "OR")
+        self.map["and"] = NodeInfo("LN", "AND") # Logic Node
+        self.map["or"] = NodeInfo("LN", "OR")
+
+    def reverseScoreComparator(self, a, b):
+        if a.score < b.score:
+            return 1
+        elif a.score > b.score:
+            return -1
+        else:
+            return 0
 
     def getNodeInfoChoices(self , node, schema):
         result = list() #final output
@@ -46,24 +55,24 @@ class NodeMapper:
         valueNodes = list()
         word = node.getWord().lower()
 
-        if word in NodeMapper.map:
-            result.append( map[word] )
+        if word in self.map:
+            result.append( self.map[word] )
             return result
 
         for tableName in schema.getTableNames():
-            result.append(NodeInfo("NN", tableName, WordSimilarity.getSimilarity(word, tableName)))
+            result.append(NodeInfo("NN", tableName, self.wordSimilarity.getSimilarity(word, tableName)))
 
             for colName in schema.getColumns(tableName):
-                result.append(NodeInfo("NN", tableName + "." + colName, WordSimilarity.getSimilarity(word, colName)))
+                result.append(NodeInfo("NN", tableName + "." + colName, self.wordSimilarity.getSimilarity(word, colName)))
 
                 for value in schema.getValues(tableName, colName):
                     if (word is None) or (value is None):
                         print "Comparing %s and %s"%(word, value)
                         print "In table %s column %s"%(tableName, colName)
 
-                    valueNodes.append(NodeInfo("VN", tableName+"."+colName, WordSimilarity.getSimilarity(word, value)))
+                    valueNodes.append(NodeInfo("VN", tableName+"."+colName, self.wordSimilarity.getSimilarity(word, value)))
 
-        result.append(valueNodes) #doubt : result.addAll() vs result.append()
+        result.extend(valueNodes)
         result.append(NodeInfo("UNKNOWN", "meaningless", 1.0))
-        print "printing NodeMapper.getNodeInfoChoices() : "+sorted(result, cmp = NodeInfo.reverseScoreComparator())
-        return sorted(result, cmp = NodeInfo.reverseScoreComparator())
+        list1 = sorted(result, cmp = self.reverseScoreComparator, reverse=True)
+        return sorted(result, cmp = self.reverseScoreComparator, reverse=True)

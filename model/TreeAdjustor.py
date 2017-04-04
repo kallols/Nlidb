@@ -1,5 +1,4 @@
 from Queue import PriorityQueue
-from .ParseTree import ParseTree
 from .SyntacticEvaluator import SyntacticEvaluator
 
 class TreeAdjuster:
@@ -46,6 +45,7 @@ class TreeAdjuster:
         sibling.parent = target
 
     def adjust(self, tree, target=None):
+        from .ParseTree import ParseTree
         if target is None:
             adjusted = list()
             if target.parent is None:

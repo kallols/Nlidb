@@ -61,10 +61,19 @@ class Ui_MainWindow(object):
         self.ctrl.chooseNode(self.getChoice())
 
     def setChoices(self, choices):
-        self.choiceBox.addItems(choices)
+        for choice in choices:
+            self.choiceBox.addItem(self.userView.createOptionMsg(choice.type, choice.value))
         self.choiceBox.setCurrentIndex(0)
         self.choiceBox.show()
         self.btnConfirmChoice.show()
+
+    def createOptionMsg(self, type, value):
+        sb = []
+        sb.append(type)
+        sb.append(" : ")
+        sb.append(value)
+        str = ''.join(sb)
+        return str
 
     def getChoice(self):
         return self.choiceBox.currentText()

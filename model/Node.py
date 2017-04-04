@@ -25,7 +25,7 @@ class Node:
         copy = Node(node.index, node.word, node.posTag, node.info)
 
         for child in node.children:
-            copyChild = self.cloneNode(self, child)
+            copyChild = self.cloneNode(child)
             copyChild.parent = copy
             copy.children.append(copyChild)
 

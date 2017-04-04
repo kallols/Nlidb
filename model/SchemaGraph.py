@@ -42,7 +42,10 @@ class SchemaGraph:
         print SchemaGraph.tables
         print "\nprinting tablerows..."
         print SchemaGraph.tableRows
-
+        print "\n printing TableNames...\n"
+        print SchemaGraph.getTableNames(self)
+        print SchemaGraph.getColumns(self, "citation")
+        print SchemaGraph.getValues(self, "citation","paper_cite_key" )
         SchemaGraph.readPrimaryKeys(self, connection)
         SchemaGraph.findConnectivity(self, connection)
 
@@ -135,5 +138,23 @@ class SchemaGraph:
             while prev[tableEnd]:
                 tableEnd = prev[tableEnd]
                 path.append(tableEnd)
-
         return path.reverse()
+
+    def getTableNames(self):
+        tableList = []
+        for tableName in self.tables:
+            tableList.append(tableName)
+        return tableList
+
+    def getColumns(self, table):
+        columnList = []
+
+        for column in self.tables[table]:
+            columnList.append(column)
+
+        return columnList
+
+    def getValues(self, tableName, columnName):
+        return self.tableRows[tableName][columnName]
+
+

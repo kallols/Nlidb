@@ -13,7 +13,7 @@ class WordSimilarity:
         WordSimilarity.data["word2"] = word2
 
         response = requests.post(WordSimilarity.url, params=WordSimilarity.data, headers=WordSimilarity.headers)
-        print response.text
+      #  print response.text
         return response.text
 
 # wordSimilarity = WordSimilarity()

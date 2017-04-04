@@ -56,6 +56,9 @@ class ParseTree:
                 self.nodes.append(Node(index=ind + 1, word=word, posTag=tagged[ind][1]))
                 ind += 1
 
+            rootInd = self.findNodeInd("ROOT")
+            retInd = self.findNodeInd("Return")
+            self.nodes[rootInd].setChild(self.nodes[retInd])
             traverseTree(gs_graph)
             print "...................."
             # self.nodes[1].setChild(self.nodes[3])
@@ -80,13 +83,13 @@ class ParseTree:
     def setEdit(self, edit):
         self.edit = edit
 
-    def removeMeaningLessNodes2(self, curr):
+    def removeMeaninglessNodes2(self, curr):
         if curr is None:
             return
         currChildren = curr.getChildren()
 
         for child in currChildren:
-            self.removeMeaningLessNodes(child)
+            self.removeMeaninglessNodes2(child)
 
         if curr != curr.equals(self.root) and curr.getInfo().getType().equals("UNKNOWN"):
             curr.parent.getChildren().remove(curr)
@@ -95,7 +98,9 @@ class ParseTree:
                 child.parent = curr.parent
 
     def removeMeaningLessNodes(self):
-        if self.root.getChildren()[0].getInfo is None:
+        childrenList = []
+        childrenList = self.root.getChildren()
+        if childrenList[0].getInfo is None:
             print "ERR! Node info not yet mapped!"
         self.removeMeaninglessNodes2(self.root)
 
@@ -419,18 +424,21 @@ class ParseTree:
         return True;
 
     #### TODO : public class ParseTreeIterator implements Iterator<Node>
+    def getSentence(self):
+        #TODO
+        return
 
     def getScore(self):
         return - SyntacticEvaluator.numberOfInvalidNodes(self);
 
-    def iterator(self):
-        return self.ParseTreeIterator()
+    def iterator(self, rootNode):
+        return self.ParseTreeIterator(rootNode)
 
     class ParseTreeIterator:
         stack = list()
 
-        def __init__(self):
-            self.stack.insert(0,ParseTree.root)
+        def __init__(self, rootNode):
+            self.stack.insert(0, rootNode)
 
         def hasNext(self):
             if len(self.stack) == 0:
@@ -440,7 +448,7 @@ class ParseTree:
         def getNext(self):
             curr = self.stack.pop(0)
             children = curr.getChildren()
-            for i in range(children.size(),-1.-1):
+            for i in range(len(children)-1,-1,-1):
                 self.stack.insert(0,children[i])
             return curr
 

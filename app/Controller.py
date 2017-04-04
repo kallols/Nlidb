@@ -46,14 +46,14 @@ class Controller:
         print("Database connection closed")
 
     def setChoicesOnView(self, choices): #TODO
-        self.view.setDisplay("Mapping nodes: \n" + self.parseTree.getSentence() + "\n");
-        self.view.appendDisplay("Currently on: " + self.node);
+        #self.view.setDisplay("Mapping nodes: \n" + self.parseTree.getSentence() + "\n");
+        self.view.appendDisplay("Currently on: " + self.node.getWord());
         #view.setChoices(FXCollections.observableArrayList(choices)); TODO doubt here
         self.view.setChoices(choices)
 
     def finishNodesMapping(self):
         print "in Finish Node Mapping...\n"
-        self.view.setDisplay("Nodes mapped.\n" + self.parseTree.getSentence())
+#        self.view.setDisplay("Nodes mapped.\n" + self.parseTree.getSentence())
         self.mappingNodes = False
         self.view.removeChoiceBoxButton()
         self.processAfterNodesMapping()
@@ -61,20 +61,24 @@ class Controller:
 
     def startMappingNodes(self): #TODO
         print "in Start Mapping Nodes...\n"
+        self.view.showNodesChoice()
+
         if self.mappingNodes:
             return
         self.mappingNodes = True
 
-        self.iter = self.parseTree.iterator()
+        self.iter = self.parseTree.iterator(self.parseTree.root)
         if not (self.iter.hasNext()) :
             self.finishNodesMapping()
             return
 
-        node = self.iter.getNext()
-        choices = self.nodeMapper.getNodeInfoChoices(node, self.schema)
+        self.node = self.iter.getNext()
+        choices = self.nodeMapper.getNodeInfoChoices(self.node, self.schema)
         if len(choices) == 1:
             self.chooseNode(choices[0])
         else:
+            print "Choices ::"
+            print choices
             self.setChoicesOnView(choices)
         print "Start Mapping Nodes Done!...\n"
 
@@ -89,8 +93,8 @@ class Controller:
             self.finishNodesMapping();
             return
 
-        node = self.iter.getNext()
-        choices = self.nodeMapper.getNodeInfoChoices(node, self.schema)
+        self.node = self.iter.getNext()
+        choices = self.nodeMapper.getNodeInfoChoices(self.node, self.schema)
         if len(choices) == 1:
             self.chooseNode(choices[0])
         else:
@@ -127,7 +131,7 @@ class Controller:
     def processAfterNodesMapping(self):
         print "Going to remove meaningless nodes for tree: "
         print self.parseTree
-        self.parseTree.removeMeaninglessNodes()
+        self.parseTree.removeMeaningLessNodes()
         print "###"
         self.parseTree.mergeLNQN()
         print "After mergeLNQn"
