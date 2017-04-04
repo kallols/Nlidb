@@ -37,8 +37,8 @@ class NodeInfo:
     def __hash__(self):
         prime = 31
         result = 1
-        result = prime * result + (0 if self.type is None else self.type.hashCode())
-        result = prime * result + (0 if self.value is None else self.value.hashCode())
+        result = prime * result + (0 if self.type is None else hash(self.type))
+        result = prime * result + (0 if self.value is None else hash(self.value))
         return result
 
     def __eq__(self, other):

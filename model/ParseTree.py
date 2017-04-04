@@ -402,10 +402,10 @@ class ParseTree:
         translator = SQLTranslator(self.root, schema)
         return translator.getResult()
 
-    def hashCode(self):
+    def __hash__(self):
         prime = 31
         result = 17
-        result = prime * result + (0 if self.root is None else  self.root.hashCode())
+        result = prime * result + (0 if self.root is None else  hash(self.root))
         return result;
 
     def equals(self, obj):
@@ -429,10 +429,28 @@ class ParseTree:
         return
 
     def getScore(self):
-        return - SyntacticEvaluator.numberOfInvalidNodes(self);
+        return - SyntacticEvaluator().numberOfInvalidNodes(self);
 
     def iterator(self, rootNode):
         return self.ParseTreeIterator(rootNode)
+
+    def __iter__(self):
+        self.stack.insert(0, self.root)
+        self.stack = list()
+        return self
+
+    stack = list()
+
+    def next(self):  # Python 3: def __next__(self)
+        if len(self.stack) == 0:
+            raise StopIteration
+        else:
+            curr = self.stack.pop(0)
+            children = curr.getChildren()
+            for i in range(len(children) - 1, -1, -1):
+                self.stack.insert(0, children[i])
+            return curr
+
 
     class ParseTreeIterator:
         stack = list()
