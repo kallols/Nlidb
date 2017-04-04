@@ -1,19 +1,21 @@
 from Queue import PriorityQueue
 from .SyntacticEvaluator import SyntacticEvaluator
 
-class TreeAdjuster:
+class TreeAdjustor:
     MAX_EDIT = 5
 
     def __init__(self):
         pass
-
-    def find(self, tree, targetNode):
+    
+    @staticmethod
+    def find(tree, targetNode):
         for node in tree:
             if node.equals(targetNode):
                 return node
         return None
 
-    def swap(self, parent, child):
+    @staticmethod
+    def swap( parent, child):
         childInfo = child.info
         childWord = child.word
         childPosTag = child.posTag
@@ -24,7 +26,8 @@ class TreeAdjuster:
         parent.word = childWord
         parent.posTag = childPosTag
 
-    def makeSibling(self, target, child):
+    @staticmethod
+    def makeSibling( target, child):
         children = target.getChildren()
         target.children = list()
         for anyChild in children:
@@ -34,7 +37,8 @@ class TreeAdjuster:
                 target.parent.children.append(child)
                 child.parent = target.parent
 
-    def makeChild(self, target, sibling):
+    @staticmethod
+    def makeChild( target, sibling):
         siblings = target.parent.children
         target.parent.children = list()
         for anySibling in siblings:
@@ -44,7 +48,8 @@ class TreeAdjuster:
         target.children.append(sibling)
         sibling.parent = target
 
-    def adjust(self, tree, target=None):
+    @staticmethod
+    def adjust( tree, target=None):
         from .ParseTree import ParseTree
         if target is None:
             adjusted = list()
@@ -53,38 +58,38 @@ class TreeAdjuster:
 
             for child in target.getChildren():
                 tempTree = ParseTree(tree)
-                self.swap(self.find(tempTree, target), self.find(tempTree, child))
+                TreeAdjuster.swap(TreeAdjuster.find(tempTree, target), TreeAdjuster.find(tempTree, child))
                 adjusted.append(tempTree)
 
             for child in target.getChildren():
                 tempTree = ParseTree(tree)
-                self.makeSibling(self.find(tempTree, target), self.find(tempTree, child))
+                TreeAdjuster.makeSibling(TreeAdjuster.find(tempTree, target), TreeAdjuster.find(tempTree, child))
                 adjusted.append(tempTree)
 
             for sibling in target.parent.getChildren():
                 if (sibling == target):
                     continue
                 tempTree = ParseTree(tree)
-                self.makeChild(self.find(tempTree, target), self.find(tempTree, sibling))
+                TreeAdjuster.makeChild(TreeAdjuster.find(tempTree, target), TreeAdjuster.find(tempTree, sibling))
                 adjusted.append(tempTree);
 
             if (target.getChildren().size() >= 2):
                 children = target.getChildren()
                 for i in range(1, children.size()):
                     tempTree = ParseTree(tree)
-                    self.swap(self.find(tempTree, children[0]),
-                              self.find(tempTree, children[i]));
+                    TreeAdjuster.swap(TreeAdjuster.find(tempTree, children[0]),
+                              TreeAdjuster.find(tempTree, children[i]));
                     adjusted.append(tempTree);
 
             return adjusted
         else:
             treeList = list()
             for node in tree:
-                treeList.extend(self.adjust(tree, node))
+                treeList.extend(TreeAdjuster.adjust(tree, node))
             return list(treeList)
 
-
-    def  getAdjustedTrees(self, tree):
+    @staticmethod
+    def getAdjustedTrees( tree):
         results = list()
         queue = PriorityQueue()
         #TODO :check if p queue is working properly
@@ -104,10 +109,10 @@ class TreeAdjuster:
             oriTree = queue.get()
             queue.put(oriTree)
 
-            if (oriTree.getEdit() >= self.MAX_EDIT):
+            if (oriTree.getEdit() >= TreeAdjuster.MAX_EDIT):
                 continue
 
-            treeList = self.adjust(oriTree)
+            treeList = TreeAdjuster.adjust(oriTree)
 
             tmp = SyntacticEvaluator()
 
