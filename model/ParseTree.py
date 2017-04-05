@@ -434,7 +434,7 @@ class ParseTree:
         #     return True
         if (obj is None):
             return False;
-        if (self.__class__ != obj.__class):
+        if (self.__class__ != obj.__class__):
             return False
 
         if (self.root is None):
@@ -451,7 +451,7 @@ class ParseTree:
         #     return True
         if (obj is None):
             return False;
-        if (self.__class__ != obj.__class):
+        if (self.__class__ != obj.__class__):
             return False
 
         if (self.root is None):

@@ -9,16 +9,11 @@ class TreeAdjustor:
     
     @staticmethod
     def find(tree, targetNode):
-        # print "Find:"
-        # print tree
         if tree is None:
             raise Exception
         for node in tree:
             if node.equals(targetNode):
                 return node
-        # print tree
-        # print "\n\n\n"
-        # print targetNode
         return None
 
     @staticmethod
@@ -67,7 +62,6 @@ class TreeAdjustor:
                 tempTree = ParseTree(node=tree.root)
                 # print "\n\nTempTree:"
                 TreeAdjustor.swap(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
-                print tempTree
                 adjusted.add(tempTree)
 
             for child in target.getChildren():
@@ -127,7 +121,7 @@ class TreeAdjustor:
         while not queue.empty():
             debug_size = queue._qsize()
             print "queue size = %d" %(debug_size)
-            oriTree = queue.queue[0]
+            oriTree = queue.get()
 
             if (oriTree.getEdit() >= TreeAdjustor.MAX_EDIT):
                 continue
