@@ -109,8 +109,8 @@ class Node:
         return result
 
     def equals(self, obj):
-        if self == obj:
-            return True
+        # if self == obj:
+        #     return True
         if obj is None:
             return False
         if not (self.__class__ == obj.__class__):
@@ -137,9 +137,9 @@ class Node:
                 return False
             if len(self.children) != len(other.children):
                 return False
-            for i in range(0, len(self.children)):
-                if not self.isEqualsNodeList(self.children[i], other.children[i]):
-                    return False
+
+            if not self.isEqualsNodeList(self.children, other.children):
+                return False
         return True
 
     def isEqualsNodeList(self, list1, list2):
@@ -188,9 +188,8 @@ class Node:
                 return False
             if len(self.children) != len(other.children):
                 return False
-            for i in range(0, len(self.children)):
-                if not self.isEqualsNodeList(self.children[i], other.children[i]):
-                    return False
+            if not self.isEqualsNodeList(self.children, other.children):
+                return False
         return True
 #
 # nodes = list()
