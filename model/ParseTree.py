@@ -15,8 +15,8 @@ class ParseTree:
 
     # TODO: This is created for the priority q . check if its working
     def __lt__(self, t2):
-        print "!!"
-        print self.toString()
+        # print "!!"
+        # print self.toString()
         return - self.getScore() + t2.getScore()
 
     def __init__(self, text=None, parser=None, node=None, other=None):
@@ -73,11 +73,10 @@ class ParseTree:
             for n in self.nodes:
                 print n.getWord()
                 print [word.getWord() for word in n.getChildren()]
-        elif node is not None:
+        elif (node is not None):
             self.root = node.clone()
         elif other is not None:
-            #todo
-            pass
+            ParseTree(node= other.root)
 
 
     def findNodeInd(self, word):
@@ -392,19 +391,19 @@ class ParseTree:
 
     def addON(self):
 
-        print "www"
-        print self
+        # print "www"
+        # print self
 
         root = self.root.clone();
 
-        on = Node(0, "equals", "postag");
-        on.info = NodeInfo("ON", "=");
+        on = Node(index=0, word="equals", posTag="postag");
+        on.info = NodeInfo(type="ON", value="=")
         root.setChild(on);
         on.setParent(root);
         tree = ParseTree(node=root);
 
-        print "qqq"
-        print tree
+        # print "qqq"
+        # print tree
 
         return tree
 
@@ -431,8 +430,8 @@ class ParseTree:
         return result;
 
     def equals(self, obj):
-        if (self == obj):
-            return True;
+        # if (self == obj):
+        #     return True
         if (obj is None):
             return False;
         if (self.__class__ != obj.__class):
@@ -441,6 +440,7 @@ class ParseTree:
         if (self.root is None):
             if (obj.root is not None):
                 return False
+
         elif (not self.root.equals(obj.root)):
             return False;
         return True;
@@ -483,8 +483,6 @@ class ParseTree:
     def __iter__(self):
         #print 123
         self.stack = list()
-        print "asda"
-        print self.root
         self.stack.insert(0, self.root)
 
         return self
@@ -492,16 +490,22 @@ class ParseTree:
     stack = list()
 
     def next(self):  # Python 3: def __next__(self)
-       # print 456
+       # print 4
         if len(self.stack) == 0:
             raise StopIteration
         else:
             curr = self.stack.pop(0)
-            print curr
+           # print curr
+            if(curr is None):
+                print "Self: "
+                print self
             children = curr.getChildren()
-            print children
+            #print children
             for i in range(len(children) - 1, -1, -1):
                 self.stack.insert(0, children[i])
+                if children[i] is None:
+                    print "hahaha:"
+                    print self
             return curr
 
 

@@ -1,5 +1,7 @@
 import copy
 
+from model.NodeInfo import NodeInfo
+
 
 class Node:
     outside = False
@@ -22,7 +24,7 @@ class Node:
         if node is None:
             return None
 
-        copy = Node(node.index, node.word, node.posTag, node.info)
+        copy = Node(index=node.index, word=node.word, posTag=node.posTag, info=node.info)
 
         for child in node.children:
             copyChild = self.cloneNode(child)
@@ -32,8 +34,8 @@ class Node:
         return copy
 
     def clone(self):
-        print "fff"
-        print self.cloneNode(self)
+        # print "fff"
+        # print self.cloneNode(self)
         return self.cloneNode(self)
 
     def getInfo(self):
@@ -95,7 +97,6 @@ class Node:
     def __hash__(self):
         prime = 31
         result = 17
-
         result = prime * result + self.index
         result = prime * result + (0 if (self.posTag is None) else hash(self.posTag))
         result = prime * result + (0 if (self.word is None) else hash(self.word))
@@ -137,8 +138,14 @@ class Node:
             if len(self.children) != len(other.children):
                 return False
             for i in range(0, len(self.children)):
-                if not self.children[i] == other.children[i]:
+                if not self.isEqualsNodeList(self.children[i], other.children[i]):
                     return False
+        return True
+
+    def isEqualsNodeList(self, list1, list2):
+        for node1 in list1:
+            if node1 not in list2:
+                return False
         return True
 
     def toString(self):
@@ -153,7 +160,38 @@ class Node:
             s = s + "(" + self.info.getType() + ":" + self.info.getValue() + ")"
         return s
 
+    def __eq__(self, obj):
 
+        if obj is None:
+            return False
+        if not (self.__class__ == obj.__class__):
+            return False
+
+        other = obj
+        if not self.index == other.index:
+            return False
+
+        if not self.word == other.word:
+            return False
+
+        if not self.posTag == other.posTag:
+            return False
+
+        if not self.info == other.info:
+            if (self.info is None) or (other.info is None):
+                return False
+            if not self.info == other.info:
+                return False
+
+        if self.children != other.children:
+            if (self.children is None) or (other.children is None):
+                return False
+            if len(self.children) != len(other.children):
+                return False
+            for i in range(0, len(self.children)):
+                if not self.isEqualsNodeList(self.children[i], other.children[i]):
+                    return False
+        return True
 #
 # nodes = list()
 # nodes.append(Node("a", "d", 0))
@@ -165,3 +203,9 @@ class Node:
 # for n in nodes:
 #     print n.getWord()
 #     print [word.getWord() for word in n.getChildren()]
+
+l1 = []
+l2 = []
+l1.append(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")))
+l2.append(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")))
+print Node.isEqualsNodeList(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")),l1, l2)
