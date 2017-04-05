@@ -53,7 +53,7 @@ class TreeAdjustorTest:
 
         print "===========test for Running getAdjustedTrees() in TreeAdjustor==========="
         print "The original tree:"
-        print T
+        #print T.toString()
         print "Number of possible trees for choice:"
 
         obj = TreeAdjustor()

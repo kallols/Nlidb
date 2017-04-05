@@ -14,10 +14,16 @@ class ParseTree:
     nodes = list()
 
     # TODO: This is created for the priority q . check if its working
-    def __lt__(t1, t2):
-        return - t1.getScore() + t2.getScore()
+    def __lt__(self, t2):
+        print "!!"
+        print self.toString()
+        return - self.getScore() + t2.getScore()
 
     def __init__(self, text=None, parser=None, node=None, other=None):
+
+
+        #self.root =None
+        #self.nodes = list()
 
         def traverseTree(tree):
             print("tree:", tree.label())
@@ -67,6 +73,12 @@ class ParseTree:
             for n in self.nodes:
                 print n.getWord()
                 print [word.getWord() for word in n.getChildren()]
+        elif node is not None:
+            self.root = node.clone()
+        elif other is not None:
+            #todo
+            pass
+
 
     def findNodeInd(self, word):
         ind = 0
@@ -379,12 +391,21 @@ class ParseTree:
             curNode.getParent().setChild(child);
 
     def addON(self):
+
+        print "www"
+        print self
+
         root = self.root.clone();
+
         on = Node(0, "equals", "postag");
         on.info = NodeInfo("ON", "=");
         root.setChild(on);
         on.setParent(root);
-        tree = ParseTree(root);
+        tree = ParseTree(node=root);
+
+        print "qqq"
+        print tree
+
         return tree
 
     def compare(self, t1, t2):
@@ -425,6 +446,17 @@ class ParseTree:
         return True;
 
     #### TODO : public class ParseTreeIterator implements Iterator<Node>
+    def nodeToString(self,curr):
+        if curr is None :
+            return ""
+        s = curr.toString() + " -> "
+        #print curr.getChildren()
+        s += ''.join( [ child.toString()  for child in curr.getChildren()]) + "\n";
+        for child in curr.getChildren():
+            s += self.nodeToString(child)
+        return s
+
+
     def getSentence(self):
         sb = []
         for n in self.nodes:
@@ -433,6 +465,15 @@ class ParseTree:
             sb.append("\n")
         return ''.join(sb)
 
+    def toString(self):
+        s ="Sentence: " + self.getSentence()+"\n"+self.nodeToString(self.root)
+        return s
+
+    def __str__(self):
+        s = "Sentence: " + self.getSentence() + "\n" + self.nodeToString(self.root)
+        return s
+
+
     def getScore(self):
         return - SyntacticEvaluator().numberOfInvalidNodes(self);
 
@@ -440,18 +481,25 @@ class ParseTree:
         return self.ParseTreeIterator(rootNode)
 
     def __iter__(self):
-        self.stack.insert(0, self.root)
+        #print 123
         self.stack = list()
+        print "asda"
+        print self.root
+        self.stack.insert(0, self.root)
+
         return self
 
     stack = list()
 
     def next(self):  # Python 3: def __next__(self)
+       # print 456
         if len(self.stack) == 0:
             raise StopIteration
         else:
             curr = self.stack.pop(0)
+            print curr
             children = curr.getChildren()
+            print children
             for i in range(len(children) - 1, -1, -1):
                 self.stack.insert(0, children[i])
             return curr

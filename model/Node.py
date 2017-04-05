@@ -32,7 +32,9 @@ class Node:
         return copy
 
     def clone(self):
-        return copy.deepcopy(self)
+        print "fff"
+        print self.cloneNode(self)
+        return self.cloneNode(self)
 
     def getInfo(self):
         return self.info
@@ -144,6 +146,13 @@ class Node:
         if not self.info is None:
             s = s + "(" + self.info.getType() + ":" + self.info.getValue() + ")"
         return s
+
+    def __str__(self):
+        s = "( %s ) %s" % (self.index, self.word)
+        if not self.info is None:
+            s = s + "(" + self.info.getType() + ":" + self.info.getValue() + ")"
+        return s
+
 
 #
 # nodes = list()

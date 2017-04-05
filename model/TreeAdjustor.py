@@ -49,7 +49,7 @@ class TreeAdjustor:
         sibling.parent = target
 
     @staticmethod
-    def adjust( tree, target=None):
+    def adjust(tree, target=None):
         from ParseTree import ParseTree
         if target is not None:
             adjusted = list()
@@ -84,9 +84,11 @@ class TreeAdjustor:
             return adjusted
         else:
             treeList = list()
+            print tree.toString()
+            print tree.root
             for node in tree:
                 treeList.extend(TreeAdjustor.adjust(tree, node))
-            return list(treeList)
+            return treeList
 
     @staticmethod
     def getAdjustedTrees( tree):
@@ -99,13 +101,21 @@ class TreeAdjustor:
         H[tree.__hash__()] = tree
         tree.setEdit(0);
 
+        #TODO addON is wrong
         treeWithON = tree.addON()
+
+        print "aaaa"
+        print treeWithON
+
+
         queue.put(treeWithON);
         results.append(treeWithON);
         H[treeWithON.__hash__()]  = treeWithON
         treeWithON.setEdit(0)
 
+
         while not queue.empty():
+            debug_size = queue._qsize()
             oriTree = queue.get()
             queue.put(oriTree)
 
