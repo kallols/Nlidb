@@ -59,40 +59,28 @@ class TreeAdjustor:
     def adjust(tree, target=None):
         from ParseTree import ParseTree
         if target is not None:
-            adjusted = list()
+            adjusted = set()
             if target.parent is None:
                 return adjusted
 
             for child in target.getChildren():
                 tempTree = ParseTree(node=tree.root)
                 # print "\n\nTempTree:"
-                # print tempTree
-                if TreeAdjustor.find(tempTree, target) is None:
-                    print "Pakka Pakka"
-                    print tempTree
-                    print "\n\n\n"
-                    print target
-
-                if TreeAdjustor.find(tempTree, child) is None:
-                    print "Pakka Pakka 2"
-                    print tempTree
-                    print "\n\n\n"
-                    print child
-
                 TreeAdjustor.swap(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
-                adjusted.append(tempTree)
+                print tempTree
+                adjusted.add(tempTree)
 
             for child in target.getChildren():
                 tempTree = ParseTree(node=tree.root)
                 TreeAdjustor.makeSibling(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
-                adjusted.append(tempTree)
+                adjusted.add(tempTree)
 
             for sibling in target.parent.getChildren():
                 if (sibling == target):
                     continue
                 tempTree = ParseTree(node=tree.root)
                 TreeAdjustor.makeChild(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, sibling))
-                adjusted.append(tempTree);
+                adjusted.add(tempTree);
 
             if (len(target.getChildren()) >= 2):
                 children = target.getChildren()
@@ -100,16 +88,17 @@ class TreeAdjustor:
                     tempTree = ParseTree(node=tree.root)
                     TreeAdjustor.swap(TreeAdjustor.find(tempTree, children[0]),
                               TreeAdjustor.find(tempTree, children[i]));
-                    adjusted.append(tempTree);
-
+                    adjusted.add(tempTree);
+            print "adjusted Size: %d" % (len(adjusted))
             return adjusted
         elif target is None:
-            treeList = list()
-            if tree is None:
-                raise Exception
+            treeList = set()
             for node in tree:
-                treeList.extend(TreeAdjustor.adjust(tree, node))
-            return treeList
+                temp = TreeAdjustor.adjust(tree, node)
+                for t in temp:
+                    treeList.add(t)
+            print "treeList Size: %d"%(len(treeList))
+            return list(treeList)
 
     @staticmethod
     def getAdjustedTrees( tree):
@@ -137,15 +126,13 @@ class TreeAdjustor:
 
         while not queue.empty():
             debug_size = queue._qsize()
-            oriTree = queue.get()
-            queue.put(oriTree)
+            print "queue size = %d" %(debug_size)
+            oriTree = queue.queue[0]
 
             if (oriTree.getEdit() >= TreeAdjustor.MAX_EDIT):
                 continue
 
             treeList = TreeAdjustor.adjust(oriTree)
-
-            tmp = SyntacticEvaluator()
 
             numInvalidNodes = SyntacticEvaluator().numberOfInvalidNodes(oriTree)
 

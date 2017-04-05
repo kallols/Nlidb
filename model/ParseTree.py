@@ -429,6 +429,23 @@ class ParseTree:
         result = prime * result + (0 if self.root is None else  hash(self.root))
         return result;
 
+    def __eq__(self, obj):
+        # if (self == obj):
+        #     return True
+        if (obj is None):
+            return False;
+        if (self.__class__ != obj.__class):
+            return False
+
+        if (self.root is None):
+            if (obj.root is not None):
+                return False
+
+        elif (not self.root.equals(obj.root)):
+            return False;
+        return True;
+
+
     def equals(self, obj):
         # if (self == obj):
         #     return True
@@ -459,10 +476,14 @@ class ParseTree:
 
     def getSentence(self):
         sb = []
-        for n in self.nodes:
-            sb.append(n.getWord())
-            sb.append(" ")
-            sb.append("\n")
+        first = True;
+        for node in self:
+            if (first):
+                sb.append(node.getWord());
+                first = False;
+            else:
+                sb.append(" ")
+                sb.append(node.getWord())
         return ''.join(sb)
 
     def toString(self):
