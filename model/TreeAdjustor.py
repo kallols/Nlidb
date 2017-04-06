@@ -36,8 +36,8 @@ class TreeAdjustor:
             if not (anyChild == child):
                 target.getChildren().append(anyChild)
 
-                target.parent.children.append(child)
-                child.parent = target.parent
+        target.parent.children.append(child)
+        child.parent = target.parent
 
     @staticmethod
     def makeChild( target, sibling):
@@ -94,6 +94,9 @@ class TreeAdjustor:
         elif target is None:
             treeList = set()
             for node in tree:
+                print "Node: "
+                print node
+
                 temp = TreeAdjustor.adjust(tree, node)
                 for t in temp:
                     treeList.add(t)

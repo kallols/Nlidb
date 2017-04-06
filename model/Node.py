@@ -203,8 +203,8 @@ class Node:
 #     print n.getWord()
 #     print [word.getWord() for word in n.getChildren()]
 
-l1 = []
-l2 = []
-l1.append(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")))
-l2.append(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")))
-print Node.isEqualsNodeList(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")),l1, l2)
+# l1 = []
+# l2 = []
+# l1.append(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")))
+# l2.append(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")))
+# print Node.isEqualsNodeList(Node(word="Kutta", posTag="dad", index="0", info=NodeInfo("a", "b")),l1, l2)
