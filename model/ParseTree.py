@@ -410,9 +410,9 @@ class ParseTree:
 
     def compare(self, t1, t2):
         if (t1.getScore() != t2.getScore()):
-            return  t1.getScore() < t2.getScore()
+            return  t1.getScore() > t2.getScore()
         else:
-            return t1.getEdit() > t2.getEdit();
+            return t1.getEdit() < t2.getEdit();
 
     def getAdjustedTrees(self):
         result = TreeAdjustor.getAdjustedTrees(self)
