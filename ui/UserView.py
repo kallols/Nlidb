@@ -44,6 +44,7 @@ class Ui_MainWindow(object):
         self.ctrl = Controller(self.userView)
         # self.nlInput = raw_input("Enter Natural Language Input:\n")
         self.nlInput = "Return the number of authors who published theory papers before 1980 ."
+        #self.nlInput = "Return the conference in each area whose papers have the most total citations ."
         self.choiceList =[]
 
     def setDisplay(self, text):
@@ -76,13 +77,14 @@ class Ui_MainWindow(object):
 
     def setChoices(self, choices):
         self.choiceList = choices
+        self.choiceBox.clear()
         for choice in choices:
-            self.choiceBox.addItem(self.userView.createOptionMsg(choice.type, choice.value))
+            self.choiceBox.addItem(self.userView.createOptionMsg(choice.getType(), choice.getValue(), choice.getScore()))
         self.choiceBox.setCurrentIndex(0)
         self.choiceBox.show()
         self.btnConfirmChoice.show()
 
-    def createOptionMsg(self, type, value):
+    def createOptionMsg(self, type, value, score):
         sb = []
         sb.append(type)
         sb.append(" : ")
@@ -148,7 +150,7 @@ class Ui_MainWindow(object):
         self.btnTreeConfirm.setGeometry(QtCore.QRect(530, 300, 131, 32))
         self.btnTreeConfirm.setObjectName(_fromUtf8("btnTreeConfirm"))
         self.btnTreeConfirm.setVisible(False)
-        self.btnTreeConfirm.clicked.connect(lambda:self.btnTreeConfirmClick(self, self.treeChoice))
+        self.btnTreeConfirm.clicked.connect(lambda:self.btnTreeConfirmClick(self.treeChoice))
 
         self.label = QtGui.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(330, 0, 261, 22))

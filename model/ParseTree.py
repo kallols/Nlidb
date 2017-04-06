@@ -17,8 +17,9 @@ class ParseTree:
     def __lt__(self, t2):
         # print "!!"
         # print self.toString()
+        a = self.getScore()
+        b = t2.getScore()
         return - self.getScore() + t2.getScore()
-
     def __init__(self, text=None, parser=None, node=None, other=None):
 
 
@@ -416,7 +417,7 @@ class ParseTree:
     def getAdjustedTrees(self):
         result = TreeAdjustor.getAdjustedTrees(self)
         sorted(result, cmp=self.compare)
-        return result.subList(0, 4)
+        return result[0:4]
 
     def translateToSQL(self, schema):
 

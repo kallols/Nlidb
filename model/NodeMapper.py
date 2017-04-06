@@ -76,6 +76,6 @@ class NodeMapper:
             result.add(nodeInfo)
 
         result.add(NodeInfo("UNKNOWN", "meaningless", 1.0))
-        result = list(result)
-        list1 = sorted(result, cmp = self.reverseScoreComparator)
-        return sorted(result, cmp = self.reverseScoreComparator)
+        list1 = list(result)
+        list2 = sorted(result, cmp = self.reverseScoreComparator)
+        return list2

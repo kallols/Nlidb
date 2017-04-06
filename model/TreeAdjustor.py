@@ -84,6 +84,12 @@ class TreeAdjustor:
                               TreeAdjustor.find(tempTree, children[i]));
                     adjusted.add(tempTree);
             print "adjusted Size: %d" % (len(adjusted))
+            print "Adjusted Trees: "
+            for tr in adjusted:
+                 print tr.getSentence()
+
+            print "------------------------------------------"
+            print "------------------------------------------"
             return adjusted
         elif target is None:
             treeList = set()
@@ -97,6 +103,7 @@ class TreeAdjustor:
     @staticmethod
     def getAdjustedTrees( tree):
         results = list()
+        ctr = 10
         queue = PriorityQueue()
         #TODO :check if p queue is working properly
         H = dict()
@@ -118,11 +125,28 @@ class TreeAdjustor:
         treeWithON.setEdit(0)
 
 
-        while not queue.empty():
+        while not queue.empty() and ctr>0:
             debug_size = queue._qsize()
             print "queue size = %d" %(debug_size)
-            oriTree = queue.get()
+            print "Queue tree: "
+            tempList =[]
 
+            for i in range(0, queue._qsize()):
+                tr = queue.get()
+                tempList.append(tr)
+                print tr.getSentence()
+
+            for tr in tempList:
+                queue.put(tr)
+
+            # if ctr == 10:
+            #     oriTree = queue.get()
+            #     # secTree = queue.get()
+            #     queue.put(oriTree)
+            #     # oriTree =secTree
+            # else:
+            oriTree = queue.get()
+            ctr = ctr - 1
             if (oriTree.getEdit() >= TreeAdjustor.MAX_EDIT):
                 continue
 
