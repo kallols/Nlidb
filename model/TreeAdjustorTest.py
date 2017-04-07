@@ -56,13 +56,18 @@ class TreeAdjustorTest:
         print T.toString()
         print "Number of possible trees for choice:"
 
-        obj = TreeAdjustor()
-        result = TreeAdjustor.getAdjustedTrees(T)
-        print len(result)
-        sorted(result,cmp=cmpp)
-        print "The three trees with highest scores look like:"
-        for i in range(0,5):
-           print result[i]
+        # obj = TreeAdjustor()
+        # result = TreeAdjustor.getAdjustedTrees(T)
+        # print len(result)
+        # sorted(result,cmp=cmpp)
+        # print "The three trees with highest scores look like:"
+        # for i in range(0,5):
+        #    print result[i]
+
+        result = TreeAdjustor.adjust(T)
+        for i in result:
+            print "%s : %d" %(i.getSentence(),i.getScore())
+            # print i
 
 def cmpp(a,b):
     if a.getScore() < b.getScore():

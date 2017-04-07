@@ -63,11 +63,14 @@ class TreeAdjustor:
                 # print "\n\nTempTree:"
                 TreeAdjustor.swap(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
                 adjusted.add(tempTree)
-
+                print "adjusted Size: %d" % (len(adjusted))
+                print "%s:%d" % (tempTree.getSentence(), tempTree.getScore())
             for child in target.getChildren():
                 tempTree = ParseTree(node=tree.root)
                 TreeAdjustor.makeSibling(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
                 adjusted.add(tempTree)
+                print "adjusted Size: %d" % (len(adjusted))
+                print "%s:%d"%(tempTree.getSentence(), tempTree.getScore())
 
             for sibling in target.parent.getChildren():
                 if (sibling == target):
@@ -76,6 +79,9 @@ class TreeAdjustor:
                 TreeAdjustor.makeChild(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, sibling))
                 adjusted.add(tempTree);
 
+                print "adjusted Size: %d" % (len(adjusted))
+                print "%s:%d" % (tempTree.getSentence(), tempTree.getScore())
+
             if (len(target.getChildren()) >= 2):
                 children = target.getChildren()
                 for i in range(1, len(children)):
@@ -83,10 +89,12 @@ class TreeAdjustor:
                     TreeAdjustor.swap(TreeAdjustor.find(tempTree, children[0]),
                               TreeAdjustor.find(tempTree, children[i]));
                     adjusted.add(tempTree);
-            print "adjusted Size: %d" % (len(adjusted))
-            print "Adjusted Trees: "
-            for tr in adjusted:
-                 print tr.getSentence()
+                    print "adjusted Size: %d" % (len(adjusted))
+                    print "%s:%d"%(tempTree.getSentence(), tempTree.getScore())
+            # print "adjusted Size: %d" % (len(adjusted))
+            # print "Adjusted Trees: "
+            # for tr in adjusted:
+            #      print tr.getSentence()
 
             print "------------------------------------------"
             print "------------------------------------------"

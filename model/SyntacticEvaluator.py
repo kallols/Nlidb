@@ -128,9 +128,9 @@ class SyntacticEvaluator:
             elif (not childType =="NN"):
                 numOfInvalid += 1;
                 node.isInvalid = True
-            else:
-                numOfInvalid += 1;
-                node.isInvalid = True
+        else:
+            numOfInvalid += 1;
+            node.isInvalid = True
         return numOfInvalid
 
     def numberOfInvalidNodes (self, T):
