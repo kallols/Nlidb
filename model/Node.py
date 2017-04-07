@@ -100,7 +100,7 @@ class Node:
         result = prime * result + self.index
         result = prime * result + (0 if (self.posTag is None) else hash(self.posTag))
         result = prime * result + (0 if (self.word is None) else hash(self.word))
-        result = prime * result + (0 if (self.info is None) else hash(self.info))
+        result = prime * result + (0 if (self.info is None) else (self.info).__hash__())
 
         if self.children is not None:
             for child in self.children:

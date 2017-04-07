@@ -12,20 +12,24 @@ class ParseTree:
     edit = None
     root = None
     nodes = list()
-
+    time = None
     # TODO: This is created for the priority q . check if its working
     def __lt__(self, t2):
         # print "!!"
         # print self.toString()
         a = self.getScore()
         b = t2.getScore()
+        # if(self.getScore() != t2.getScore()):
         return  self.getScore() >  t2.getScore()
+        # else:
+        #     return self.time < t2.time
+
     def __init__(self, text=None, parser=None, node=None, other=None):
 
 
         #self.root =None
         #self.nodes = list()
-
+        self.time = None
         def traverseTree(tree):
             print("tree:", tree.label())
             parInd = self.findNodeInd(tree.label())
@@ -412,7 +416,7 @@ class ParseTree:
         if (t1.getScore() != t2.getScore()):
             return  t1.getScore() > t2.getScore()
         else:
-            return t1.getEdit() < t2.getEdit();
+            return t1.getEdit() < t2.getEdit()
 
     def getAdjustedTrees(self):
         result = TreeAdjustor.getAdjustedTrees(self)
@@ -427,8 +431,8 @@ class ParseTree:
     def __hash__(self):
         prime = 31
         result = 17
-        result = prime * result + (0 if self.root is None else  hash(self.root))
-        return result;
+        result = prime * result + (0 if self.root is None else (self.root).__hash__())
+        return result
 
     def __eq__(self, obj):
         # if (self == obj):

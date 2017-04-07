@@ -1,5 +1,7 @@
 from Queue import PriorityQueue
 from SyntacticEvaluator import SyntacticEvaluator
+from time import gmtime, strftime
+from datetime import datetime
 
 class TreeAdjustor:
     MAX_EDIT = 5
@@ -63,11 +65,17 @@ class TreeAdjustor:
                 # print "\n\nTempTree:"
                 TreeAdjustor.swap(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
                 adjusted.add(tempTree)
+                # print "adjusted Size: %d" % (len(adjusted))
+                # print "%s:%d" % (tempTree.getSentence(), tempTree.getScore())
+                tempTree.time = str(datetime.now())
 
             for child in target.getChildren():
                 tempTree = ParseTree(node=tree.root)
                 TreeAdjustor.makeSibling(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, child))
                 adjusted.add(tempTree)
+                # print "adjusted Size: %d" % (len(adjusted))
+                # print "%s:%d" % (tempTree.getSentence(), tempTree.getScore())
+                tempTree.time =str(datetime.now())
 
             for sibling in target.parent.getChildren():
                 if (sibling == target):
@@ -75,6 +83,9 @@ class TreeAdjustor:
                 tempTree = ParseTree(node=tree.root)
                 TreeAdjustor.makeChild(TreeAdjustor.find(tempTree, target), TreeAdjustor.find(tempTree, sibling))
                 adjusted.add(tempTree);
+                # print "adjusted Size: %d" % (len(adjusted))
+                # print "%s:%d" % (tempTree.getSentence(), tempTree.getScore())
+                tempTree.time = str(datetime.now())
 
             if (len(target.getChildren()) >= 2):
                 children = target.getChildren()
@@ -83,25 +94,41 @@ class TreeAdjustor:
                     TreeAdjustor.swap(TreeAdjustor.find(tempTree, children[0]),
                               TreeAdjustor.find(tempTree, children[i]));
                     adjusted.add(tempTree);
+
+                    # print "%s:%d" % (tempTree.getSentence(), tempTree.getScore())
+                    tempTree.time = str(datetime.now())
+
+            # print "------------------------------------------"
+            # print "------------------------------------------"
             print "adjusted Size: %d" % (len(adjusted))
-            # print "Adjusted Trees: "
-            # for tr in adjusted:
-            #      print tr.getSentence()
-            #
-            # print "------------------------------------------"
-            # print "------------------------------------------"
             return adjusted
         elif target is None:
             treeList = set()
             for node in tree:
                 # print "Node: "
                 # print node
-
                 temp = TreeAdjustor.adjust(tree, node)
                 for t in temp:
                     treeList.add(t)
+                    t.timeStamp = str(datetime.now())
+                    # t.time = str(datetime.now())
             print "treeList Size: %d"%(len(treeList))
-            return list(treeList)
+            # for t in treeList:
+            #     print "%s:%d" % (t.getSentence(), t.getScore())
+            m =list(treeList)
+            # l =sorted(m, cmp =TreeAdjustor.timeStampCompare)
+            for i in range(0, len(m)):
+                for j in range(i+1, len(m)):
+                    if(m[i].time > m[j].time):
+                        temp = m[i]
+                        m[i] =m[j]
+                        m[j] = temp
+
+            return m
+
+    @staticmethod
+    def timeStampCompare(tree1, tree2):
+        return tree1.time < tree2.time
 
     @staticmethod
     def getAdjustedTrees( tree):
@@ -111,6 +138,7 @@ class TreeAdjustor:
         #TODO :check if p queue is working properly
         H = dict()
         queue.put(tree)
+
         results.append(tree);
         H[tree.__hash__()] = tree
         tree.setEdit(0);
@@ -123,23 +151,33 @@ class TreeAdjustor:
 
 
         queue.put(treeWithON);
+
         results.append(treeWithON);
         H[treeWithON.__hash__()]  = treeWithON
         treeWithON.setEdit(0)
 
 
-        while not queue.empty() :
+        while not queue.empty():
             ctr -= 1
+            scoreList = []
+            editList = []
             debug_size = queue._qsize()
-            print "queue size = %d" %(debug_size)
+            print "\nqueue size = %d\n" %(debug_size)
             # print "Queue tree: "
             tempList =[]
-            #
+
             # for i in range(0, queue._qsize()):
             #     tr = queue.get()
+            #     #print tr.getSentence()
+            #     # print "%s --> %d"%(tr.getSentence(), tr.getScore())
+            #     scoreList.append(tr.getScore())
+            #     editList.append(tr.getEdit())
             #     tempList.append(tr)
-            #     print tr.getSentence()
             #
+            # print "scoreList: "
+            # print scoreList
+            # print "editList: "
+            # print editList
             # for tr in tempList:
             #     queue.put(tr)
 
@@ -150,7 +188,8 @@ class TreeAdjustor:
             #     # oriTree =secTree
             # else:
             oriTree = queue.get()
-
+            # print "Currently Adjusting tree: "
+            # print "%s:%d" % (oriTree.getSentence(), oriTree.getScore())
             if (oriTree.getEdit() >= TreeAdjustor.MAX_EDIT):
                 continue
 
@@ -160,18 +199,26 @@ class TreeAdjustor:
 
             for i in range(0,len(treeList)):
                 currentTree = treeList[i]
+                # print "current Tree to insert %s:%d"%(currentTree.getSentence(), currentTree.getScore())
                 hashValue = currentTree.__hash__()
                 if not(H.has_key(hashValue) ):
                     H[hashValue] =  currentTree
                     currentTree.setEdit(oriTree.getEdit() + 1);
                     if SyntacticEvaluator().numberOfInvalidNodes(currentTree) <= numInvalidNodes:
-                        queue.put(currentTree);
-                        results.append(currentTree);
-
-
+                        # print "Added: %s %d"%(currentTree.getSentence(), currentTree.getScore())
+                        # print "__________________________________________________________________"
+                        queue.put(currentTree)
+                        # print "___________________________________________________________________"
+                        results.append(currentTree)
+                        # tempList = []
+                        # print "------------------------------------------------------"
+                        # for i in range(0, queue._qsize()):
+                        #     tr = queue.get()
+                        #     # print tr.getSentence()
+                        #     print "%s %d"%(tr.getSentence(), tr.getScore())
+                        #     tempList.append(tr)
+                        # print "------------------------------------------------------"
+                        # print "------------------------------------------------------\n\n"
+                        # for tr in tempList:
+                        #     queue.put(tr)
         return results
-
-
-
-
-
