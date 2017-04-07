@@ -15,7 +15,7 @@ class SyntacticEvaluator:
         elif(sizeOfChildren == 1 and not children[0].getInfo().getType() =="SN"):
             numOfInvalid += 1
             node.isInvalid = True
-        elif (sizeOfChildren > 1):
+        elif(sizeOfChildren > 1):
             if (not children[0].getInfo().getType() =="SN"):
                 numOfInvalid += 1
                 node.isInvalid = True
