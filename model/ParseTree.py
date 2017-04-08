@@ -20,9 +20,10 @@ class ParseTree:
         a = self.getScore()
         b = t2.getScore()
         # if(self.getScore() != t2.getScore()):
-        return  self.getScore() >  t2.getScore()
+        #     return  self.getScore() >  t2.getScore()
         # else:
         #     return self.time < t2.time
+        return self.getScore() > t2.getScore()
 
     def __init__(self, text=None, parser=None, node=None, other=None):
 
@@ -109,7 +110,7 @@ class ParseTree:
         for child in currChildren:
             self.removeMeaninglessNodes2(child)
 
-        if (not curr.equals(self.root)) and curr.getInfo().getType() == "UNKNOWN":
+        if (not curr == self.root) and curr.getInfo().getType() == "UNKNOWN":
             curr.parent.getChildren().remove(curr)
             for child in curr.getChildren():
                 curr.parent.getChildren().add(child)
@@ -124,7 +125,7 @@ class ParseTree:
     def insertImplicitNodes(self):
         childrenOfRoot = self.root.getChildren()
 
-        if childrenOfRoot.size() <= 1:
+        if len(childrenOfRoot) <= 1:
             return
 
         # phase 1, add nodes under select to left subtree
@@ -231,8 +232,8 @@ class ParseTree:
                                 FN_children = nodes[indexOfNewRightCN - 1].getChildren();
 
                                 for j in range(0, len(FN_children)):
-                                    copy.setChild(FN_children.get(j));
-                                    FN_children.get(j).setParent(copy);
+                                    copy.setChild(FN_children[j])
+                                    FN_children[j].setParent(copy);
 
                                 copy.setParent(nodes[indexOfNewRightCN - 1]);
                                 nodes[indexOfNewRightCN - 1].children = list()
@@ -262,18 +263,18 @@ class ParseTree:
                             NV_children_right = nodes_new[indexOfRightCoreNode].getChildren();
                             found_NV = False;
 
-                            curr_left = NV_children_left.get(j);
+                            curr_left = NV_children_left[j]
                             curr_left_type = curr_left.getInfo().getType();
 
                             for k in range(0, len(NV_children_right)):
                                 # compare
-                                curr_right = NV_children_right.get(k);
+                                curr_right = NV_children_right[k]
 
                                 # strictly compare, exact match ON
 
-                                if (curr_left_type.equals("ON")):
+                                if (curr_left_type == "ON"):
 
-                                    if (curr_left.equals(curr_right)):
+                                    if (curr_left == curr_right):
                                         found_NV = True;
                                         break
                                 else:
@@ -349,7 +350,7 @@ class ParseTree:
 
         for i in range(2, len(nodes)):
 
-            if (nodes[i].getParent().equals(nodes[0])):
+            if (nodes[i].getParent() == nodes[0]):
                 return i - 1;
 
         return -1
@@ -367,7 +368,7 @@ class ParseTree:
 
         if (not left):
             startIndex = self.endOfLeftBranch(nodes) + 1;
-            endIndex = nodes.length - 1;
+            endIndex = len(nodes) - 1;
 
         for i in range(startIndex, endIndex):
 
@@ -424,8 +425,7 @@ class ParseTree:
         return result[0:4]
 
     def translateToSQL(self, schema):
-
-        translator = SQLTranslator(self.root, schema)
+        translator = SQLTranslator(self.root, schema, None)
         return translator.getResult()
 
     def __hash__(self):
@@ -446,7 +446,7 @@ class ParseTree:
             if (obj.root is not None):
                 return False
 
-        elif (not self.root.equals(obj.root)):
+        elif (not self.root == obj.root):
             return False;
         return True;
 
@@ -463,7 +463,7 @@ class ParseTree:
             if (obj.root is not None):
                 return False
 
-        elif (not self.root.equals(obj.root)):
+        elif (not self.root == obj.root):
             return False;
         return True;
 

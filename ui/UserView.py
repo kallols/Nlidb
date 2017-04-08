@@ -96,18 +96,20 @@ class Ui_MainWindow(object):
         return self.choiceBox.currentText()
 
     def showTreesChoice(self):
-        self.btnConfirmChoice.show()
+        self.treeChoice.addItem("0")
+        self.treeChoice.addItem("1")
+        self.treeChoice.addItem("2")
         self.btnTreeConfirm.show()
+        self.treeChoice.show()
 
     def removeTreesChoices(self):
         self.btnConfirmChoice.hide()
-        self.btnTreeConfirm.hide()
 
     def startTranslation(self):
         self.ctrl.processNaturalLanguage(self.nlInput)
 
     def btnTreeConfirmClick(self, treeChoice):
-        self.ctrl.chooseTree(treeChoice.currentText())
+        self.ctrl.chooseTree(int(treeChoice.currentText()))
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("Main Window"))
@@ -194,3 +196,4 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+#     ROOT Return number authors papers before 1980

@@ -12,19 +12,18 @@ class SyntacticEvaluator:
         if (sizeOfChildren == 0):
             numOfInvalid += 1
             node.isInvalid = True
-        elif(sizeOfChildren == 1 and not children[0].getInfo().getType() =="SN"):
+        elif(sizeOfChildren == 1 and (not children[0].getInfo().getType() =="SN")):
             numOfInvalid += 1
             node.isInvalid = True
         elif(sizeOfChildren > 1):
-            if (not children[0].getInfo().getType() =="SN"):
+            if (not (children[0].getInfo().getType() =="SN")):
                 numOfInvalid += 1
                 node.isInvalid = True
             else:
                 for j in range(1, sizeOfChildren):
-                    if (not children[j].getInfo().getType() =="ON"):
+                    if (not (children[j].getInfo().getType() =="ON")):
                         numOfInvalid += 1
                         node.isInvalid = True
-
         return numOfInvalid
 
 
@@ -150,7 +149,6 @@ class SyntacticEvaluator:
                 numOfInvalid = numOfInvalid + self.checkVN(curNode)
             elif (curType =="FN"):
                 numOfInvalid = numOfInvalid + self.checkFN(curNode)
-
 
         return numOfInvalid
 
