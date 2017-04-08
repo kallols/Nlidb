@@ -92,7 +92,11 @@ class Node:
             for i in range(len(currChildren) - 1, -1, -1):
                 stack.insert(0, currChildren[i])
 
-        return nodesList
+        nodes = list()
+        for node in nodesList:
+            nodes.append(node)
+
+        return nodes
 
     def __hash__(self):
         prime = 31

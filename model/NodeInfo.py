@@ -7,7 +7,6 @@ class NodeInfo:
         self.type = type
         self.value = value
         self.score = score
-        pass
 
     def getType(self):
         return self.type
@@ -26,13 +25,6 @@ class NodeInfo:
             return -1
         else:
             return 0
-        # if a < b:
-        #     return 1
-        # elif a > b:
-        #     return -1
-        # else:
-        #     return 0
-
 
     def __hash__(self):
         prime = 31
@@ -46,7 +38,8 @@ class NodeInfo:
         #     return True
         if other is None:
             return False
-        if type(self) != type(other):
+
+        if not (self.__class__ == other.__class__):
             return False
 
         if self.type is None:
@@ -88,12 +81,12 @@ class NodeInfo:
             indexOfDot = -1
 
         if indexOfDot_Other == -1:
-            indexOfDot_Other = other.getValue().length()
+            indexOfDot_Other = len(other.getValue())
 
         if indexOfDot == -1:
-            indexOfDot = self.value.length()
+            indexOfDot = len(self.value)
 
-        if other.getValue()[0, indexOfDot_Other - 1] == self.value[0, indexOfDot - 1]:
+        if other.getValue()[0 : indexOfDot_Other - 1] == self.value[0 : indexOfDot - 1]:
             return True
 
         return False

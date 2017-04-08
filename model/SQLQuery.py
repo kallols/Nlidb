@@ -8,23 +8,34 @@ class SQLQuery:
     def __init__(self):
         self.map = dict()
         self.map["SELECT"] = list()
-        self.map["FROM"] = list()
-        self.map["WHERE"] = list()
+        self.map["FROM"] = set()
+        self.map["WHERE"] = set()
         self.blocks = list()
 
     def get(self):
         return SQLQuery.toString()
+
+    def getCollection(self, keyWord):
+        return list(self.map[keyWord])
 
     def addBlock(self, query):
         self.blocks.append(query)
         SQLQuery.add(self, "FROM", "BLOCK%d"%len(self.blocks))
 
     def add(self, key, value):
-        temp = self.map[key]
-        temp.append(value)
-        self.map[key] = temp
+        if self.isSet(key):
+            self.map[key].add(value)
+        else:
+            self.map[key].append(value)
 
-    def toSBLine(self, SELECT):
+    def isSet(self, key):
+        if(key == "SELECT"):
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def toSBLine( SELECT):
         sb = []
         for val in SELECT:
             if len(sb) == 0:
@@ -32,9 +43,10 @@ class SQLQuery:
             else:
                 sb.append(", ")
                 sb.append(val)
-            return ''.join(sb)
+        return ''.join(sb)
 
-    def toSBLineCondition(self, WHERE):
+    @staticmethod
+    def toSBLineCondition(WHERE):
         sb = []
         for val in WHERE:
             if len(sb) == 0:
@@ -45,13 +57,13 @@ class SQLQuery:
         return ''.join(sb)
 
     def toString(self):
-        if len(self.map["SELECT"]) == 0 or len(self.map["WHERE"]) == 0:
+        if len(self.map["SELECT"]) == 0 or len(self.map["FROM"]) == 0:
             return "Illegal Query"
 
-        sb = list()
-        for i in range(0, len(self.blocks), 1):
-            sb.append("BLOCK%s:\n"%(i+1))
-            sb.append("%s\n"%self.blocks[i])
+        sb = []
+        for i in range(0, len(self.blocks)):
+            sb.append("BLOCK%d:\n"%(i+1))
+            sb.append("%s\n"%self.blocks[i].toString())
             ''.join(sb)
 
         sb.append("SELECT ")
