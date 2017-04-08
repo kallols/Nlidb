@@ -4,7 +4,7 @@ from time import gmtime, strftime
 from datetime import datetime
 
 class TreeAdjustor:
-    MAX_EDIT = 5
+    MAX_EDIT = 4
 
     def __init__(self):
         pass

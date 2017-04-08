@@ -385,7 +385,7 @@ class ParseTree:
                 nodes[i].getParent().setWord(parentWord);
                 self.removeNode(nodes[i]);
 
-        tree = ParseTree(self.root);
+        tree = ParseTree(node = self.root);
         return tree
 
     def removeNode(self, curNode):
