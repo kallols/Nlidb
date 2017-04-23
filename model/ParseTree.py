@@ -6,6 +6,7 @@ from model.TreeAdjustor import TreeAdjustor
 from model.NodeInfo import NodeInfo
 from model.SQLTranslator import SQLTranslator
 from model.SyntacticEvaluator import SyntacticEvaluator
+from model.Utils import Utils
 
 
 class ParseTree:
@@ -13,6 +14,10 @@ class ParseTree:
     root = None
     nodes = list()
     time = None
+    utils = None
+    removed = False
+    indexOfRightCoreNode = -1
+    indexOfLeftCoreNode = -1
     # TODO: This is created for the priority q . check if its working
     def __lt__(self, t2):
         # print "!!"
@@ -31,6 +36,11 @@ class ParseTree:
         #self.root =None
         #self.nodes = list()
         self.time = None
+        self.indexOfRightCoreNode = -1
+        self.indexOfLeftCoreNode = -1
+        self.utils = Utils()
+        self.removed = False
+
         def traverseTree(tree):
             print("tree:", tree.label())
             parInd = self.findNodeInd(tree.label())
@@ -47,6 +57,9 @@ class ParseTree:
                     self.nodes[parInd].setChild(self.nodes[childInd])
                     self.nodes[childInd].setParent(self.nodes[parInd])
                     print type(subtree.encode('ascii', 'ignore'))
+
+        if text is None and parser is not None and node is None and other is None:
+            pass
 
         if text is not None and parser is not None and node is None and other is None:
             tagged = parser.tagger.tag(text.split())
@@ -71,8 +84,9 @@ class ParseTree:
                 ind += 1
 
             rootInd = self.findNodeInd("ROOT")
-            retInd = self.findNodeInd("Return")
+            retInd = self.findNodeInd(gs_graph.label())
             self.nodes[rootInd].setChild(self.nodes[retInd])
+            self.nodes[retInd].setParent(self.nodes[rootInd])
             traverseTree(gs_graph)
             print "...................."
             # self.nodes[1].setChild(self.nodes[3])
@@ -105,20 +119,37 @@ class ParseTree:
     def removeMeaninglessNodes2(self, curr):
         if curr is None:
             return
-        currChildren = curr.getChildren()
+        currChildren = list(curr.getChildren())
 
-        for child in currChildren:
-            self.removeMeaninglessNodes2(child)
+
+        for i in range(0, len(currChildren)):
+            print "aaaaaaaaaaaaa"
+            print curr
+            print currChildren
+            print "ki:----------------------------- "
+            print currChildren[i]
+            self.removeMeaninglessNodes2(currChildren[i])
+            # if(self.removed == True):
+            #     i = i-1
+            #     self.removed = False
+
 
         if (not curr == self.root) and curr.getInfo().getType() == "UNKNOWN":
+            print "current: "
+            print curr
             curr.parent.getChildren().remove(curr)
+            self.removed = True
+            print "After removeing curr.parent.getChildren(): "
+            ctr =0
+            for c in curr.parent.getChildren():
+                print "Node %d : " %ctr
+                print c
             for child in curr.getChildren():
-                curr.parent.getChildren().add(child)
+                curr.parent.getChildren().append(child)
                 child.parent = curr.parent
 
     def removeMeaningLessNodes(self):
-        childrenList = self.root.getChildren()
-        if childrenList[0].getInfo is None:
+        if self.root.getChildren()[0].getInfo() is None:
             print "ERR! Node info not yet mapped!"
         self.removeMeaninglessNodes2(self.root)
 
@@ -134,7 +165,8 @@ class ParseTree:
         IndexOfSN = 0
         for i in range(0, len(childrenOfRoot)):
             if (childrenOfRoot[i].getInfo().getType() == "SN"):
-                IndexOfSN = i;
+                IndexOfSN = i
+                break
 
         # start from the name node
 
@@ -145,7 +177,7 @@ class ParseTree:
         for i in range(0, len(SN_children)):
 
             if (SN_children[i].getInfo().getType() == "NN"):
-                IndexOfSN_NN = i;
+                IndexOfSN_NN = i
                 break
 
         # add them to left subtree of all branches
@@ -170,8 +202,8 @@ class ParseTree:
 
         # phase 2, compare left core node with right core node
         print "Phase 2, core node insertion"
-        indexOfRightCoreNode = -1
-        indexOfLeftCoreNode = -1
+        self.indexOfRightCoreNode = -1
+        self.indexOfLeftCoreNode = -1
 
         for i in range(0, len(childrenOfRoot)):
 
@@ -183,32 +215,31 @@ class ParseTree:
 
                 # if right tree only contains numbers, skip it
 
-                if sizeOfRightTree != 1 or not self.isNumeric(nodes[startOfRightBranch].getWord()):
+                if sizeOfRightTree != 1 or (not self.isNumeric(nodes[startOfRightBranch].getWord())):
 
-                    indexOfLeftCoreNode = self.coreNode(nodes, True);
-                    indexOfRightCoreNode = self.coreNode(nodes, False);
+                    self.indexOfLeftCoreNode = self.coreNode(nodes, left=True);
+                    self.indexOfRightCoreNode = self.coreNode(nodes, left=False);
 
                     # if left core node exists
 
-                    if indexOfLeftCoreNode != -1:
+                    if self.indexOfLeftCoreNode != -1:
 
                         doInsert = False;
 
                         # if right subtree neither have core node nor it only contains number
-                        if indexOfRightCoreNode == -1:
+                        if self.indexOfRightCoreNode == -1:
 
                             # copy core node only
 
                             doInsert = True;
-                        elif not nodes[indexOfRightCoreNode].getInfo().ExactSameSchema(
-                                nodes[indexOfLeftCoreNode].getInfo()):
+                        elif not nodes[self.indexOfRightCoreNode].getInfo().ExactSameSchema(nodes[self.indexOfLeftCoreNode].getInfo()):
                             # if right core node & left core node are different schema
                             # copy core node only
                             doInsert = True;
 
                         if doInsert:
 
-                            copy = nodes[indexOfLeftCoreNode].clone()
+                            copy = nodes[self.indexOfLeftCoreNode].clone()
                             copy.children = list()
                             copy.setOutside(True)
 
@@ -254,13 +285,13 @@ class ParseTree:
                         # phase 3, map each NV under left core node to right core node
 
                         print "Phase 3, transfer constrain nodes from left to right"
-                        NV_children_left = nodes[indexOfLeftCoreNode].getChildren()
+                        NV_children_left = nodes[self.indexOfLeftCoreNode].getChildren()
 
                         for j in range(0, len(NV_children_left)):
 
                             nodes_new = childrenOfRoot[i].genNodesArray();
-                            indexOfRightCoreNode = self.coreNode(nodes_new, False);
-                            NV_children_right = nodes_new[indexOfRightCoreNode].getChildren();
+                            self.indexOfRightCoreNode = self.coreNode(nodes_new, left=False);
+                            NV_children_right = nodes_new[self.indexOfRightCoreNode].getChildren();
                             found_NV = False;
 
                             curr_left = NV_children_left[j]
@@ -287,47 +318,47 @@ class ParseTree:
                                 # insert
 
                                 copy = curr_left.clone();
-                                nodes_new[indexOfRightCoreNode].setChild(copy);
+                                nodes_new[self.indexOfRightCoreNode].setChild(copy);
                                 copy.setOutside(True);
-                                copy.setParent(nodes_new[indexOfRightCoreNode]);
+                                copy.setParent(nodes_new[self.indexOfRightCoreNode]);
 
-                    # phase 4, insert function node
+                        # phase 4, insert function node
 
-                    print "Phase 4, insert missing function node"
+                        print "Phase 4, insert missing function node"
 
-                    nodes_final_temp = childrenOfRoot[i].genNodesArray();
-                    indexOfLeftFN_Tail = -1;
+                        nodes_final_temp = childrenOfRoot[i].genNodesArray();
+                        indexOfLeftFN_Tail = -1;
 
-                    for j in range(indexOfLeftCoreNode, -1, -1):
+                        for j in range(self.indexOfLeftCoreNode, -1, -1):
 
-                        if (nodes_final_temp[j].getInfo().getType() == "FN"):
-                            indexOfLeftFN_Tail = j;
-                            break;
+                            if (nodes_final_temp[j].getInfo().getType() == "FN"):
+                                indexOfLeftFN_Tail = j;
+                                break;
 
-                    if (indexOfLeftFN_Tail != -1):
+                        if (indexOfLeftFN_Tail != -1):
 
-                        for k in range(1, indexOfLeftFN_Tail + 1):
+                            for k in range(1, indexOfLeftFN_Tail + 1):
 
-                            nodes_final = childrenOfRoot[i].genNodesArray();
-                            indexOfRightCoreNode = self.coreNode(nodes_final, False);
+                                nodes_final = childrenOfRoot[i].genNodesArray();
+                                self.indexOfRightCoreNode = self.coreNode(nodes_final, left=False);
 
-                            found_FN = False;
+                                found_FN = False;
 
-                            for j in range(self.endOfLeftBranch(nodes_final) + 1, indexOfRightCoreNode, -1):
+                                for j in range(self.endOfLeftBranch(nodes_final) + 1, self.indexOfRightCoreNode):
 
-                                if (nodes_final[j].getInfo().ExactSameSchema(nodes_final[k].getInfo())):
-                                    found_FN = True;
+                                    if (nodes_final[j].getInfo().ExactSameSchema(nodes_final[k].getInfo())):
+                                        found_FN = True;
 
-                            if (not found_FN):
-                                copy = nodes_final[k].clone();
-                                copy.setOutside(True);
-                                copy.children = list()
-                                nodes[0].removeChild(nodes_final[self.endOfLeftBranch(nodes_final) + 1]);
-                                nodes[0].setChild(copy);
+                                if (not found_FN):
+                                    copy = nodes_final[k].clone();
+                                    copy.setOutside(True);
+                                    copy.children = list()
+                                    nodes[0].removeChild(nodes_final[self.endOfLeftBranch(nodes_final) + 1]);
+                                    nodes[0].setChild(copy);
 
-                                copy.setParent(nodes[0]);
-                                copy.setChild(nodes[self.endOfLeftBranch(nodes_final) + 1]);
-                                nodes[self.endOfLeftBranch(nodes_final) + 1].setParent(copy);
+                                    copy.setParent(nodes[0]);
+                                    copy.setChild(nodes[self.endOfLeftBranch(nodes_final) + 1]);
+                                    nodes[self.endOfLeftBranch(nodes_final) + 1].setParent(copy);
 
     def IndexToInsertCN(self, nodes):
         for i in range(self.endOfLeftBranch(nodes) + 1, len(nodes)):
@@ -370,7 +401,7 @@ class ParseTree:
             startIndex = self.endOfLeftBranch(nodes) + 1;
             endIndex = len(nodes) - 1;
 
-        for i in range(startIndex, endIndex):
+        for i in range(startIndex, endIndex+1):
 
             if (nodes[i].getInfo().getType() == "NN"):
                 return i
@@ -386,7 +417,7 @@ class ParseTree:
                 nodes[i].getParent().setWord(parentWord);
                 self.removeNode(nodes[i]);
 
-        tree = ParseTree(self.root);
+        tree = ParseTree(node = self.root);
         return tree
 
     def removeNode(self, curNode):
@@ -406,7 +437,7 @@ class ParseTree:
         on.info = NodeInfo(type="ON", value="=")
         root.setChild(on);
         on.setParent(root);
-        tree = ParseTree(node=root);
+        tree = ParseTree(node = root);
 
         # print "qqq"
         # print tree
@@ -415,23 +446,36 @@ class ParseTree:
 
     def compare(self, t1, t2):
         if (t1.getScore() != t2.getScore()):
-            return  t1.getScore() > t2.getScore()
+            return  - t1.getScore() + t2.getScore()
         else:
-            return t1.getEdit() < t2.getEdit()
+            return t1.getEdit() - t2.getEdit()
 
     def getAdjustedTrees(self):
-        result = TreeAdjustor.getAdjustedTrees(self)
-        sorted(result, cmp=self.compare)
+        result = TreeAdjustor.getAdjustedTrees(tree=self)
+        result = sorted(result, cmp=self.compare)
+        # for i in range(0, 100):
+        #     for j in range(i + 1, len(result)):
+        #         if (result[i].getScore() <= result[j].getScore()):
+        #             temp = result[i]
+        #             result[i] = result[j]
+        #             result[j] = temp
+        for tree in result:
+             print "Final Tree: %s %d"%(tree.getSentence(), tree.getScore())
         return result[0:4]
 
-    def translateToSQL(self, schema):
-        translator = SQLTranslator(self.root, schema, None)
+    def translateToSQL(self, schema = None):
+        translator = SQLTranslator(root=self.root, schema=schema, block=None)
         return translator.getResult()
 
     def __hash__(self):
         prime = 31
         result = 17
         result = prime * result + (0 if self.root is None else (self.root).__hash__())
+
+        # prime = 31
+        # result = 17
+        # print "calling with a =%d, b= %d, c =%d"%(prime, result, (0 if self.root is None else (self.root).__hash__()))
+        # result = self.utils.calc(prime , result , (0 if self.root is None else (self.root).__hash__()))
         return result
 
     def __eq__(self, obj):
@@ -501,7 +545,8 @@ class ParseTree:
 
 
     def getScore(self):
-        return - SyntacticEvaluator().numberOfInvalidNodes(self);
+        #print "Parse tree: getScore()"
+        return - SyntacticEvaluator().numberOfInvalidNodes(T=self);
 
     def iterator(self, rootNode):
         return self.ParseTreeIterator(rootNode)

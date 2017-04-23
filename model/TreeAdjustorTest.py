@@ -1,4 +1,3 @@
-import psycopg2
 
 from ParseTree import ParseTree
 from Node import Node
@@ -143,13 +142,13 @@ class TreeAdjustorTest:
         # elif a.getScore() > b.getScore():
         #     return 1
         return a.getScore() > b.getScore()
-# """ Connect to MySQL database """
-try:
-    connection = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='Codechef'")
-except:
-    print "I am unable to connect to the database"
-    print "connected to database..."
-TreeAdjustorTest.schema = SchemaGraph(connection)
+# # """ Connect to MySQL database """
+# try:
+#     connection = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='Codechef'")
+# except:
+#     print "I am unable to connect to the database"
+#     print "connected to database..."
+#TreeAdjustorTest.schema = SchemaGraph(connection)
 obj = TreeAdjustorTest()
 obj.getAdjustedTreesTest()
 # obj.adjustTest()

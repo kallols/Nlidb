@@ -134,8 +134,10 @@ class SyntacticEvaluator:
 
     def numberOfInvalidNodes (self, T):
         numOfInvalid = 0
-        #print type(T)
+        # print T
         for curNode in T:
+            # print "Node"
+            # print curNode
             curType = curNode.getInfo().getType()
             if (curType =="ROOT"):
                 numOfInvalid = numOfInvalid + self.checkROOT(curNode)

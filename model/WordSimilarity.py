@@ -16,5 +16,5 @@ class WordSimilarity:
       #  print response.text
         return response.text
 
-# wordSimilarity = WordSimilarity()
-# wordSimilarity.getSimilarity("scopes", "book")
+wordSimilarity = WordSimilarity()
+wordSimilarity.getSimilarity("scopes", "book")

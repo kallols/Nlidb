@@ -1,12 +1,16 @@
+from Utils import Utils
+
 class NodeInfo:
     type = None
     value = None
     score = 1.0
+    utils = None
 
     def __init__(self, type, value, score=1.0):
         self.type = type
         self.value = value
         self.score = score
+        self.utils =Utils()
 
     def getType(self):
         return self.type
@@ -31,6 +35,11 @@ class NodeInfo:
         result = 1
         result = prime * result + (0 if self.type is None else hash(self.type))
         result = prime * result + (0 if self.value is None else hash(self.value))
+
+        # prime = 31
+        # result = 1
+        # result = self.utils.calc(prime , result , (0 if self.type is None else self.utils.hash(self.type)))
+        # result = self.utils.calc(prime , result , (0 if self.value is None else self.utils.hash(self.value)))
         return result
 
     def __eq__(self, other):

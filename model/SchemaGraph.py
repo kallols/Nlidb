@@ -103,6 +103,32 @@ class SchemaGraph:
         print "\nprinting connectivity: "
         print SchemaGraph.connectivity
 
+    def getJoinKeys(self, table1, table2):
+        table1Keys = SchemaGraph.keys[table1]
+        table2Keys = SchemaGraph.keys[table2]
+
+        if table1Keys == table2Keys:
+            return set()
+        keys1ContainedIn2 = True
+
+        for table1Key in table1Keys:
+            if not table1Key in SchemaGraph.tables[table2]:
+                keys1ContainedIn2 = False
+                break
+
+        if keys1ContainedIn2:
+            return set(table1Keys)
+
+        keys2ContainedIn1 = True
+        for table2Key in table2Keys:
+            if not table2Key in SchemaGraph.tables[table1]:
+                keys2ContainedIn1 = False
+                break
+
+        if keys2ContainedIn1:
+            return set(table2Keys)
+        return set()
+
     def getJoinPath(self, table1, table2):
         # todo
         if not (table1 in SchemaGraph.tables) or not (table2 in SchemaGraph.tables):
@@ -118,7 +144,7 @@ class SchemaGraph:
         visited[table1] = True
         found = False
 
-        while queue and not found:
+        while len(queue)!=0 and not found:
             tableCurr = queue[0]
             del queue[0]  # remove first
 
@@ -134,11 +160,11 @@ class SchemaGraph:
 
         if visited[table2]:
             tableEnd = table2
-            path.append(tableEnd)
-            while prev[tableEnd]:
+            path.insert(0, tableEnd)
+            while tableEnd in prev:
                 tableEnd = prev[tableEnd]
-                path.append(tableEnd)
-        return path.reverse()
+                path.insert(0, tableEnd)
+        return path
 
     def getTableNames(self):
         tableList = []

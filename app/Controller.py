@@ -31,6 +31,7 @@ class Controller:
         """ Connect to MySQL database """
         try:
             self.conn = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='Codechef'")
+            # self.conn = psycopg2.connect("dbname='db_b130974cs' user='postgres' host='localhost' password='Codechef'")
         except:
             print "I am unable to connect to the database"
         print "connected to database..."
@@ -67,6 +68,8 @@ class Controller:
 
     def startMappingNodes(self): #TODO
         print "in Start Mapping Nodes...\n"
+        print "Parse Tree: "
+        print self.parseTree
         self.view.showNodesChoice()
 
         if self.mappingNodes:
@@ -141,6 +144,9 @@ class Controller:
             print n.getWord()
             print [word.getWord() for word in n.getChildren()]
         self.parseTree.removeMeaningLessNodes()
+        print "After removing meaningless nodes from tree, tree is: "
+        print self.parseTree
+
         print "###"
         self.parseTree.mergeLNQN()
         print "After mergeLNQn"

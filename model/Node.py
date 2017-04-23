@@ -1,7 +1,7 @@
 import copy
 
 from model.NodeInfo import NodeInfo
-
+from Utils import Utils
 
 class Node:
     outside = False
@@ -12,13 +12,17 @@ class Node:
     parent = None
     children = list()
     isInvalid = False
-
+    utils = None
     def __init__(self, word, posTag, index=0, info=None):
         self.index = index
         self.word = word
         self.posTag = posTag
         self.info = info
+        self.outside = False
+        self.parent = None
+        self.isInvalid = False
         self.children = list()
+        self.utils = Utils()
 
     def cloneNode(self, node):
         if node is None:
@@ -106,10 +110,17 @@ class Node:
         result = prime * result + (0 if (self.word is None) else hash(self.word))
         result = prime * result + (0 if (self.info is None) else (self.info).__hash__())
 
+        # prime = 31
+        # result = 17
+        # result = self.utils.calc(prime , result , self.index)
+        # result = self.utils.calc(prime , result , (0 if (self.posTag is None) else self.utils.hash(self.posTag)))
+        # result = self.utils.calc(prime , result , (0 if (self.word is None) else self.utils.hash(self.word)))
+        # result = self.utils.calc(prime , result , (0 if (self.info is None) else (self.info).__hash__()))
+
         if self.children is not None:
             for child in self.children:
+                # result = self.utils.calc(prime , result , child.__hash__())
                 result = prime * result + child.__hash__()
-
         return result
 
     def equals(self, obj):
@@ -195,6 +206,10 @@ class Node:
             if not self.isEqualsNodeList(self.children, other.children):
                 return False
         return True
+
+# i = Utils()
+# print i.calc(2**31-1, 1, 1)
+# print i.hash("abc")
 #
 # nodes = list()
 # nodes.append(Node("a", "d", 0))

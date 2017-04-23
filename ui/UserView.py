@@ -43,7 +43,7 @@ class Ui_MainWindow(object):
         self.userView = self
         self.ctrl = Controller(self.userView)
         # self.nlInput = raw_input("Enter Natural Language Input:\n")
-        self.nlInput = "Return the number of authors who published theory papers before 1980 ."
+        self.nlInput = "Return number of authors who published theory papers before 1980 ."
         #self.nlInput = "Return the conference in each area whose papers have the most total citations ."
         self.choiceList =[]
 
