@@ -3,6 +3,7 @@ class SchemaGraph:
     tableRows = None
     keys = None
     connectivity = None
+    schemaText = ""
 
     def __init__(self, connection):
 
@@ -35,17 +36,22 @@ class SchemaGraph:
                                % (col[0], table_name[0]))
                 row = cursor.fetchall()
                 col_name_values_dict[col[0]] = row
+            sb= []
+            for table in SchemaGraph.tables:
+                sb.append(table)
+                sb.append("\n")
 
+            SchemaGraph.schemaText = "".join(sb)
             SchemaGraph.tables[table_name[0]] = col_name_type_dict
             SchemaGraph.tableRows[table_name[0]] = col_name_values_dict
+
+
         print "\nprinting tables..."
         print SchemaGraph.tables
         print "\nprinting tablerows..."
         print SchemaGraph.tableRows
         print "\n printing TableNames...\n"
         print SchemaGraph.getTableNames(self)
-        print SchemaGraph.getColumns(self, "citation")
-        print SchemaGraph.getValues(self, "citation","paper_cite_key" )
         SchemaGraph.readPrimaryKeys(self, connection)
         SchemaGraph.findConnectivity(self, connection)
 

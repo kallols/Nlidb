@@ -21,16 +21,17 @@ class Controller:
     iter = None
 
     def __init__(self, userView):
+        self.view = userView
         self.startConnection()
         self.nodeMapper = NodeMapper()
         self.parser = NLParser()
-        self.view = userView
         print "Controller initialized."
 
     def startConnection(self):
         """ Connect to MySQL database """
         try:
-            self.conn = psycopg2.connect("dbname='dblp' user='postgres' host='localhost' password='Codechef'")
+            self.conn = psycopg2.connect("dbname='library' user='postgres' host='localhost' password='Codechef'")
+            # self.conn = psycopg2.connect("dbname='library' user='postgres' host='localhost' password='Codechef'")
             # self.conn = psycopg2.connect("dbname='db_b130974cs' user='postgres' host='localhost' password='Codechef'")
         except:
             print "I am unable to connect to the database"
@@ -52,15 +53,16 @@ class Controller:
         sb.append(self.parseTree.getSentence())
         self.view.setDisplay(''.join(sb))
         sb = []
-        sb.append("Currently on: ")
+        sb.append("\nCurrently on: (")
         sb.append(self.node.getWord())
+        sb.append(")\n")
         self.view.appendDisplay( ''.join(sb))
         #view.setChoices(FXCollections.observableArrayList(choices)); TODO doubt here
         self.view.setChoices(choices)
 
     def finishNodesMapping(self):
         print "in Finish Node Mapping...\n"
-#        self.view.setDisplay("Nodes mapped.\n" + self.parseTree.getSentence())
+        self.view.setDisplay("Nodes mapped.\n" + self.parseTree.getSentence())
         self.mappingNodes = False
         self.view.removeChoiceBoxButton()
         self.processAfterNodesMapping()
@@ -135,6 +137,14 @@ class Controller:
         print "Going to do translation for tree: %s\n"%self.parseTree
         self.query = self.parseTree.translateToSQL(self.schema)
         self.view.setDisplay(self.query.toString())
+        cur = self.conn.cursor()
+        cur.execute(self.query.toString())
+        result = cur.fetchall()
+        print "Query: %s"%self.query.toString()
+        print "\n\n\nOutput:"
+        for row in result:
+            print row
+
         self.processing = False
 
     def processAfterNodesMapping(self):
@@ -159,5 +169,7 @@ class Controller:
         else:
             self.processing = True
             self.parseTree = ParseTree(input, parser=self.parser)
+            print "Process Natural: "
+            print self.parseTree
             self.startMappingNodes()
 

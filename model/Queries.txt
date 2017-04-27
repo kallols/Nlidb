@@ -1,0 +1,167 @@
+# SN simple
+1. Give me every book
+Query: SELECT book FROM book;
+Output:
+('(1,Heartless,Stephens,Romantic,123,Martin)',)
+('(2,King,Khan,Action,342,Khan)',)
+('(3,Lord,Bose,History,233,BPB)',)
+...
+('(25,Beautiful,Oldman,Romantic,389,McGrawHill)',)
+('(26,Mind,Narayana,Science,612,Scifi)',)
+('(27,Tempest,Narayana,Science,231,Scifi)',)
+
+
+2. fetch all book whose name is Shiva
+3. Return all book title and pages
+Query: SELECT book.title, book.pages FROM book;
+Output:
+[('Heartless', 123), ('King', 342), ('Lord', 233)
+.....
+('Beautiful', 389),('Mind', 612),('Tempest', 231)]
+
+Fetch all customer name and address
+SELECT customer.name, customer.address FROM customer;
+('John', 'Delhi'),('Adam', 'Delhi'),('Kishor', 'Mumbai')
+...
+('Suraj', 'Delhi'),('Chaitanya', 'Raigarh'),('Neeraj', 'Raipur')
+
+#SN Complex
+4. Return name of customer who issued a book named Inception
+SELECT issue, customer.name
+FROM customer, book, issue
+WHERE book.book_id = issue.book_id AND customer.customer_id = issue.customer_id AND book.title = 'Inception' AND issue.book_id = book.book_id;
+Output: ('(16,19,12,2009)', 'Vishal')
+
+#ON simple
+5. fetch all book whose author is Amrish
+SELECT book FROM book WHERE book.author = 'Amrish';
+('(21,Shiva,Amrish,Drama,543,Tripathi)',),
+('(22,Shiva2,Amrish,Drama,323,Tripathi)',),
+('(23,Shiva3,Amrish,Drama,464,Tripathi)',).
+
+#ON Complex
+6. Print all book published by Tripathi publications and whose genre is Drama
+    SELECT book FROM book WHERE book.genre = 'Drama' AND book.publisher = 'Tripathi';
+    Output:
+    ('(21,Shiva,Amrish,Drama,543,Tripathi)',),
+    ('(22,Shiva2,Amrish,Drama,323,Tripathi)',),
+    ('(23,Shiva3,Amrish,Drama,464,Tripathi)',)
+
+#ON Complex
+7. fetch all customers names  who issued Drama book of Amrish
+SELECT customer.name, issue FROM customer, book, issue WHERE book.genre = 'Drama' AND book.book_id = issue.book_id AND customer.customer_id = issue.customer_id AND book.author = 'Amrish' AND issue.book_id = book.book_id;
+Output:
+('(17,21,13,2011)', 'Vipin')
+('(18,22,14,2015)', 'Mayank')
+('(19,23,14,2013)', 'Mayank')
+
+#LN complex
+8 .fetch all customers names  who have not issued any book of Amrish
+SELECT customer.name, issue
+FROM customer, book, issue
+WHERE book.book_id = issue.book_id AND customer.customer_id = issue.customer_id AND book.author != 'Amrish' AND issue.book_id = book.book_id;
+('John', '(1,1,0,2015)'),('Adam', '(2,2,1,2016)'),('Adam', '(3,3,1,2015)')
+....
+('Bhupendra', '(14,16,9,2011)'),('Anurag', '(15,17,8,2010)'),('Vishal', '(16,19,12,2009)')
+
+#LN simple
+9. Return name of customers who are not living in mumbai .
+SELECT customer.name
+FROM customer
+WHERE customer.address != 'Mumbai';
+Output:
+('John',),('Adam',),('Kamlesh',),('Akshay',),('Jobin',),('Nirant',),
+('Anurag',),('Bhupendra',),('Harshit',),('Balmukund',),('Vipin',),('Mayank',)
+('Anand',),('Astik',),('Ashok',),('Prabhav',),('Suraj',),('Chaitanya',),('Neeraj',)
+
+#ON Complex
+10. fetch all customer who have issued any book before 2014
+SELECT customer
+FROM customer, issue
+WHERE customer.customer_id = issue.customer_id AND issue.date < 2014;
+Output:
+('(2,Kishor,Mumbai,9147542363)',),('(3,Kamlesh,Raigarh,9148954662)',),
+('(3,Kamlesh,Raigarh,9148954662)',),('(5,Jobin,Calicut,9147242426)',),
+('(5,Jobin,Calicut,9147242426)',),('(8,Anurag,Raigarh,7332842921)',),
+('(8,Anurag,Raigarh,7332842921)',),('(9,Bhupendra,Raipur,7332821414)',),
+('(12,Vishal,Mumbai,7332842921)',),('(13,Vipin,Calicut,7332842923)',),
+('(14,Mayank,Bilaspur,8522424413)',)
+
+11. Return customer name , address and issue date of book Shiva
+SELECT issue.date, customer.address, customer.name
+FROM customer, book, issue
+WHERE book.book_id = issue.book_id AND customer.customer_id = issue.customer_id AND book.title = 'Shiva' AND issue.book_id = book.book_id;
+Output:
+(2011, 'Calicut', 'Vipin')
+
+12. fetch all book titles whose author is Amrish
+13. fetch all book pages whose author is Amrish
+14. fetch all book pages whose name is Lord
+15. fetch all book pages , genre whose author is Amrish
+
+
+
+#FN SIMPLE
+16. Return count of customer we have
+SELECT COUNT(customer) FROM customer;
+Output: (22)
+
+17. Return number of books
+SELECT COUNT(book)
+FROM book;
+Output: (27)
+
+18. Return average pages in books
+SELECT AVG(book.pages)
+FROM book;
+Output: ('424.0370370370370370')
+
+19. give me the customers count
+
+#FN_ON Complex
+20. Return count of customer we have who issued book before 2016
+SELECT COUNT(customer)
+FROM customer, issue
+WHERE customer.customer_id = issue.customer_id AND issue.date < 2016;
+Output: (18)
+
+FN
+21. Return average pages in books by Amrish
+SELECT AVG(book.pages)
+FROM book
+WHERE book.author = 'Amrish';
+Output:
+('443.3333333333333333')
+
+22. print the number of customer do we have whose name is Anurag ?
+SELECT COUNT(customer)
+FROM customer
+WHERE customer.name = 'Anurag';
+
+
+23.Return name and phone of customer who lives in Delhi
+SELECT customer.phone, customer.name
+FROM customer
+WHERE customer.address = 'Delhi';
+Output:
+('9567843232', 'John')
+('9547543332', 'Adam')
+('73328423231', 'Harshit')
+('7332323923', 'Astik')
+('7332842867', 'Suraj')
+
+24. Return number of customer who lives in Delhi .
+25. give me the author of the book with title shiva .
+26. print who is author of the book Shiva ?
+27. fetch all books .
+28. give me the customer count.
+29. give me name of the books .
+30. Return issue date of book Inception .
+31. fetch all title and author of book whose publisher is BPB .
+32. Return all issued book names .
+33. give what is the name of the author of the book shiva ?
+34. Return name of all publishers .
+35. Return number of publishers .
+36. Return name of the publisher of book shiva ?
+37. Return phone of the customer who issued book Shiva .
+38. Return number of the books whose publisher is BPB .

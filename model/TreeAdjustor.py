@@ -97,23 +97,23 @@ class TreeAdjustor:
                     adjusted.add(tempTree);
                     tempTree.time = str(datetime.now())
 
-            print "adjusted Size: %d" % (len(adjusted))
+            # print "adjusted Size: %d" % (len(adjusted))
 
             # for t in adjusted:
             #     print "adjusted tree : %s %d %s %d"%(t.getSentence(), t.getScore(), t.time, t.__hash__())
             # #return adjusted
-            m = list(adjusted)
             # for i in range(0, len(m)):
             #     for j in range(i+1, len(m)):
             #         if(m[i].time > m[j].time):
             #             temp = m[i]
-            #             m[i] =m[j]
-            #             m[j] = temp
+            #             # m[i] =m[j]
+            #             # m[j] = temp
 
             # for t in m:
             #     print "adjusted tree : %s %d %s"%(t.getSentence(), t.getScore(), t.time)
 
             # return adjusted
+            m = list(adjusted)
             return m
         elif target is None:
             treeList = set()
@@ -183,7 +183,7 @@ class TreeAdjustor:
             scoreList = []
             editList = []
             debug_size = queue._qsize()
-            print "\nqueue size = %d\n" %(debug_size)
+            # print "\nqueue size = %d\n" %(debug_size)
             # print "Queue tree: "
             tempList =[]
 
@@ -216,7 +216,7 @@ class TreeAdjustor:
                 continue
 
             treeList = TreeAdjustor.adjust(oriTree)
-            print "treeAdjuster :219 "
+            # print "treeAdjuster :219 "
             numInvalidNodes = SyntacticEvaluator().numberOfInvalidNodes(oriTree)
 
             for i in range(0,len(treeList)):
@@ -226,30 +226,10 @@ class TreeAdjustor:
                 if not( H.has_key(hashValue) ):
                     H[hashValue] =  currentTree
                     currentTree.setEdit(oriTree.getEdit() + 1);
-                    print "treeAdjuster :229 "
+                    # print "treeAdjuster :229 "
                     if SyntacticEvaluator().numberOfInvalidNodes(currentTree) <= numInvalidNodes:
-                        #print "Added: %s %d"%(currentTree.getSentence(), currentTree.getScore())
-                        # print "current Tree to insert %s:%d" % (currentTree.getSentence(), currentTree.getScore())
-                        # print "__________________________________________________________________\n"
-                        #     if currentTree not in treeHashSet:
-                        #         queue.put(currentTree)
-                        #     else:
-                        #         print "continue ;-)"
-                        #         continue
-                        # print "___________________________________________________________________\n"
                         queue.put(currentTree)
                         results.append(currentTree)
-                        # tempList = []
-                        # print "------------------------------------------------------"
-                        # for i in range(0, queue._qsize()):
-                        #     tr = queue.get()
-                        #     # print tr.getSentence()
-                        #     print "Queue: %s %d"%(tr.getSentence(), tr.getScore())
-                        #     tempList.append(tr)
-                        # print "------------------------------------------------------"
-                        # print "------------------------------------------------------\n\n"
-                        # for tr in tempList:
-                        #     queue.put(tr)
-        for tr in results:
-            print "Result: %s %d" % (tr.getSentence(), tr.getScore())
+        # for tr in results:
+        #     print "Result: %s %d" % (tr.getSentence(), tr.getScore())
         return results

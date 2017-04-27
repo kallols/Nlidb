@@ -28,7 +28,7 @@ class NLParser:
         NLParser.tagger.java_options = '-mx4096m'  ### Setting higher memory limit for long sentences
         NLParser.parser = StanfordDependencyParser(
             path_to_jar='../lib/stanford/stanford-parser-full-2016-10-31/stanford-parser.jar')
-
+        print "Parser Initialized........."
         NLParser.parser.raw_parse(self.sentence)
 
         # print [parse.tree() for parse in self.parser.raw_parse("The quick brown fox jumps over the lazy dog.")]

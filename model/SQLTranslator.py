@@ -58,7 +58,7 @@ class SQLTranslator:
             attribute = VN.getInfo().getValue();
             value = VN.getWord();
         if not(self.isNumber(value)):
-            value = "\"" + value + "\""
+            value = "\'" + value + "\'"
 
         self.query.add("WHERE", attribute + " " + compareSymbol + " " + value)
         self.query.add("FROM", attribute.split(".")[0])

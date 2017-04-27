@@ -12,7 +12,10 @@ class NodeMapper:
         self.wordSimilarity = WordSimilarity()
         self.map = dict()
 
-        self.map["return"] = NodeInfo("SN", "SELECT") # Select Node
+        self.map["return"] = NodeInfo("SN", "SELECT")
+        self.map["fetch"] = NodeInfo("SN", "SELECT")
+        self.map["give"] = NodeInfo("SN", "SELECT")
+        self.map["print"] = NodeInfo("SN", "SELECT")
 
         self.map["equals"]= NodeInfo("ON", "=") # Operator Node
         self.map["less"] = NodeInfo("ON", "<")
@@ -29,6 +32,7 @@ class NodeMapper:
         self.map["most"] = NodeInfo("FN", "MAX")
         self.map["total"] = NodeInfo("FN", "SUM")
         self.map["number"] = NodeInfo("FN", "COUNT")
+        self.map["count"] = NodeInfo("FN", "COUNT")
 
         self.map["all"] = NodeInfo("QN", "ALL") # Quantifier Node
         self.map["any"] = NodeInfo("QN", "ANY")
@@ -75,7 +79,15 @@ class NodeMapper:
         for nodeInfo in valueNodes:
             result.add(nodeInfo)
 
-        result.add(NodeInfo("UNKNOWN", "meaningless", 1.0))
-        list1 = list(result)
-        list2 = sorted(result, cmp = self.reverseScoreComparator)
-        return list2
+        sortedResultList = sorted(result, cmp = self.reverseScoreComparator)
+
+        if self.isclose(float(sortedResultList[0].getScore()),1.0):
+            sortedResultList.insert(1, NodeInfo("UNKNOWN", "meaningless", 1.0))
+        else:
+            sortedResultList.insert(0, NodeInfo("UNKNOWN", "meaningless", 1.0))
+
+        return sortedResultList
+
+    def isclose(self, a, b, rel_tol=1e-09, abs_tol=0.0):
+        return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
